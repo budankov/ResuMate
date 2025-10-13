@@ -1,4 +1,4 @@
-package com.resumate
+package com.budankov.resumate
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

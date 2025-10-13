@@ -1,4 +1,4 @@
-package com.resumate
+package com.budankov.resumate
 
 import android.app.Application
 import com.facebook.react.PackageList
