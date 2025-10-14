@@ -1,14 +1,20 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import RootNavigator from './src/navigation/RootNavigator';
+import { colors } from './src/styles/colors';
 
 function App() {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <RootNavigator />
-      </NavigationContainer>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: colors.primary }}
+        edges={['top']}
+      >
+        <NavigationContainer>
+          <RootNavigator />
+        </NavigationContainer>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 }

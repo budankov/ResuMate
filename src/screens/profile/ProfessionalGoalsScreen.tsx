@@ -2,10 +2,10 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../styles/colors';
 
-const HomeScreen = () => {
+const ProfessionalGoalsScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Home</Text>
+      <Text style={styles.text}>ProfessionalGoalsScreen</Text>
     </View>
   );
 };
@@ -21,4 +21,5 @@ const styles = StyleSheet.create({
     color: 'white',
   },
 });
-export default HomeScreen;
+
+export default ProfessionalGoalsScreen;
