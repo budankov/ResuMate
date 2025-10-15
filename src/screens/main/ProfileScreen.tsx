@@ -1,61 +1,52 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import ProfileIcon from '../../assets/icons/ProfileIcon';
+import { ScrollView, StyleSheet, Text } from 'react-native';
+import { s } from 'react-native-size-matters';
 import ProfileButton from '../../components/buttons/ProfileButton';
 import { colors } from '../../styles/colors';
+import { screens } from '../profile/ScreenList';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
 
   return (
-    <View style={styles.container}>
-      <ProfileButton
-        onPress={() => navigation.navigate('PersonalInformationScreen')}
-        title="Персональна інформація"
-        children={<ProfileIcon />}
-      />
-      <ProfileButton
-        onPress={() => navigation.navigate('ProfessionalGoalsScreen')}
-        title="Професійні цілі"
-        children={<ProfileIcon />}
-      />
-      <ProfileButton
-        onPress={() => navigation.navigate('WorkExperienceScreen')}
-        title="Досвід роботи"
-        children={<ProfileIcon />}
-      />
-      <ProfileButton
-        onPress={() => navigation.navigate('EducationScreen')}
-        title="Освіта"
-        children={<ProfileIcon />}
-      />
-      <ProfileButton
-        onPress={() => navigation.navigate('SkillsScreen')}
-        title="Навички"
-        children={<ProfileIcon />}
-      />
-    </View>
+    <ScrollView
+      style={{ backgroundColor: colors.primary }}
+      contentContainerStyle={styles.container}
+    >
+      <Text
+        style={{
+          color: 'white',
+          fontSize: 20,
+          alignSelf: 'center',
+          paddingBottom: 10,
+        }}
+      >
+        Профіль користувача
+      </Text>
+      {screens.map(screen => {
+        const Icon = screen.icon;
+        return (
+          <ProfileButton
+            key={screen.name}
+            onPress={() => navigation.navigate(screen.name)}
+            title={screen.title}
+            children={<Icon />}
+          />
+        );
+      })}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    paddingHorizontal: s(10),
+    paddingVertical: 20,
     backgroundColor: colors.primary,
-  },
-  button: {
-    width: '100%',
-    backgroundColor: 'green',
-    padding: 10,
-    borderRadius: 20,
-    marginVertical: 5,
-  },
-  title: {
-    color: 'white',
+    // flex: 1, // НЕ ставимо flex:1 для contentContainerStyle
   },
 });
 export default ProfileScreen;
