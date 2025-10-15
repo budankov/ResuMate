@@ -1,5 +1,7 @@
 import React, { FC } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { s, vs } from 'react-native-size-matters';
+import ChevronLeftIcon from '../../assets/icons/ChevronLeftIcon';
 import { colors } from '../../styles/colors';
 
 type CustomHeaderProps = {
@@ -22,7 +24,7 @@ const CustomHeader: FC<CustomHeaderProps> = ({ navigation, route, back }) => {
     <View style={styles.header}>
       {back && (
         <Pressable onPress={navigation.goBack}>
-          <Text style={styles.back}>{'<'} Назад</Text>
+          <ChevronLeftIcon size={30} color={colors.fonts} />
         </Pressable>
       )}
       <Text style={styles.title}>{title}</Text>
@@ -32,21 +34,21 @@ const CustomHeader: FC<CustomHeaderProps> = ({ navigation, route, back }) => {
 
 const styles = StyleSheet.create({
   header: {
-    height: 50,
-    backgroundColor: colors.yellow,
+    height: vs(50),
+    backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: s(16),
   },
   back: {
-    color: '#fff',
-    fontSize: 16,
+    color: colors.fonts,
+    fontSize: s(16),
   },
   title: {
-    color: '#fff',
+    color: colors.fonts,
     fontWeight: 'bold',
-    fontSize: 16,
-    marginLeft: 20,
+    fontSize: s(16),
+    marginLeft: s(20),
   },
 });
 
