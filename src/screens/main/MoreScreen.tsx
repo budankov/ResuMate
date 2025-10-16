@@ -1,20 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { colors } from '../../styles/colors';
 
 const MoreScreen = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <Text>MoreScreen</Text>
-        <Text>MoreScreen</Text>
-        <Text>MoreScreen</Text>
-        <Text>MoreScreen</Text>
-        <Text>MoreScreen</Text>
-        <Text>MoreScreen</Text>
-        <Text>MoreScreen</Text>
-      </View>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Text style={styles.text}>MoreScreen</Text>
+    </View>
   );
 };
 
@@ -23,6 +15,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: colors.primary,
+  },
+  text: {
+    color: 'white',
   },
 });
 export default MoreScreen;

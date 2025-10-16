@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
 import ChevronLeftIcon from '../../assets/icons/ChevronLeftIcon';
+import { screens } from '../../screens/profile/ScreenList';
 import { colors } from '../../styles/colors';
 
 type CustomHeaderProps = {
@@ -10,15 +11,11 @@ type CustomHeaderProps = {
   back?: any;
 };
 
-const titles: Record<string, string> = {
-  PersonalInformationScreen: 'Персональна інформація',
-  ProfessionalGoalsScreen: 'Професійні цілі',
-};
-
 const CustomHeader: FC<CustomHeaderProps> = ({ navigation, route, back }) => {
   if (route.name === 'ProfileScreen') return null;
 
-  const title = titles[route.name] || route.name;
+  const screen = screens.find(screen => screen.name === route.name);
+  const title = screen ? screen.title : route.name;
 
   return (
     <View style={styles.header}>

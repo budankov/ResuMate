@@ -30,7 +30,7 @@ const ProfileButton: React.FC<ProfileButtonProps> = ({
     >
       {({ pressed }) => {
         const iconWithProps = React.cloneElement(children, {
-          size: 24,
+          size: s(20),
           color: pressed ? colors.yellow : colors.fonts,
         });
 
@@ -47,7 +47,7 @@ const ProfileButton: React.FC<ProfileButtonProps> = ({
               </View>
               <Text style={styles.text}>{title}</Text>
             </View>
-            <ChevronRightIcon size={24} color={colors.fonts} />
+            <ChevronRightIcon size={s(20)} color={colors.fonts} />
           </>
         );
       }}
@@ -62,10 +62,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.primary,
-    paddingVertical: vs(6),
+    paddingVertical: vs(4),
     paddingHorizontal: s(15),
-    borderRadius: 16,
-    gap: 12,
+    borderRadius: s(16),
+    gap: s(12),
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.25)',
     marginVertical: vs(2),
@@ -73,16 +73,16 @@ const styles = StyleSheet.create({
   titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: s(12),
   },
   iconWrapper: {
-    width: 40,
-    height: 40,
+    width: s(36),
+    height: s(36),
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    borderRadius: 10,
-    borderWidth: 2,
+    borderRadius: s(10),
+    borderWidth: s(2),
     borderColor: colors.subFonts,
   },
   text: {

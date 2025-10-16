@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
-import { s } from 'react-native-size-matters';
+import { s, vs } from 'react-native-size-matters';
 import ProfileButton from '../../components/buttons/ProfileButton';
 import { colors } from '../../styles/colors';
 import { screens } from '../profile/ScreenList';
@@ -44,9 +44,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'flex-start',
     paddingHorizontal: s(10),
-    paddingVertical: 20,
+    paddingVertical: vs(20),
     backgroundColor: colors.primary,
-    // flex: 1, // НЕ ставимо flex:1 для contentContainerStyle
   },
 });
 export default ProfileScreen;
