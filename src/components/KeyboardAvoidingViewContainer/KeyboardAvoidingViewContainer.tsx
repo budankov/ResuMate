@@ -1,5 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { s } from 'react-native-size-matters';
+import { IS_ANDROID } from '../../constants/constants';
 import { colors } from '../../styles/colors';
 
 interface IKeyboardAvoidingViewContainer {
@@ -29,9 +31,9 @@ const KeyboardAvoidingViewContainer: FC<IKeyboardAvoidingViewContainer> = ({
   return (
     <KeyboardAvoidingView
       behavior="padding"
-      keyboardVerticalOffset={50}
+      keyboardVerticalOffset={IS_ANDROID ? s(60) : s(55)}
       style={styles.key}
-      enabled={!enabled}
+      enabled={IS_ANDROID ? !enabled : true}
     >
       {children}
     </KeyboardAvoidingView>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
 import AppTextInput from '../../components/inputs/AppTextInput';
@@ -8,12 +8,26 @@ import { colors } from '../../styles/colors';
 const PersonalInformationScreen = () => {
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [webpage, setWebpage] = useState('');
+  const [address, setAddress] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [city, setCity] = useState('');
+  const [region, setRegion] = useState('');
+  const [country, setCountry] = useState('');
+
+  const scrollRef = useRef<ScrollView>(null);
 
   return (
     <KeyboardAvoidingViewContainer>
       <ScrollView
-        style={{ backgroundColor: colors.primary }}
+        style={{
+          flex: 1,
+          backgroundColor: colors.primary,
+        }}
         contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
       >
         <AppTextInput placeholder="Імʼя" value={name} onChangeText={setName} />
         <AppTextInput
@@ -24,44 +38,40 @@ const PersonalInformationScreen = () => {
         <Text style={styles.title}>Контактна інформація</Text>
         <AppTextInput
           placeholder="Електронна пошта"
-          value={surname}
-          onChangeText={setSurname}
+          value={email}
+          onChangeText={setEmail}
         />
         <AppTextInput
           placeholder="Телефон"
-          value={surname}
-          onChangeText={setSurname}
+          value={phone}
+          onChangeText={setPhone}
         />
         <AppTextInput
           placeholder="Веб-сторінка"
-          value={surname}
-          onChangeText={setSurname}
+          value={webpage}
+          onChangeText={setWebpage}
         />
         <Text style={styles.title}>Місцезнаходження</Text>
         <AppTextInput
           placeholder="Адреса"
-          value={surname}
-          onChangeText={setSurname}
+          value={address}
+          onChangeText={setAddress}
         />
         <AppTextInput
           placeholder="Поштовий індекс"
-          value={surname}
-          onChangeText={setSurname}
+          value={zipCode}
+          onChangeText={setZipCode}
         />
-        <AppTextInput
-          placeholder="Місто"
-          value={surname}
-          onChangeText={setSurname}
-        />
+        <AppTextInput placeholder="Місто" value={city} onChangeText={setCity} />
         <AppTextInput
           placeholder="Область"
-          value={surname}
-          onChangeText={setSurname}
+          value={region}
+          onChangeText={setRegion}
         />
         <AppTextInput
           placeholder="Країна"
-          value={surname}
-          onChangeText={setSurname}
+          value={country}
+          onChangeText={setCountry}
         />
       </ScrollView>
     </KeyboardAvoidingViewContainer>
@@ -71,7 +81,7 @@ const PersonalInformationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    // justifyContent: 'flex-start',
+    justifyContent: 'flex-start',
     backgroundColor: colors.primary,
     paddingHorizontal: s(10),
     paddingVertical: vs(20),
