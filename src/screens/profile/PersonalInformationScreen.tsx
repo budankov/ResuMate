@@ -1,84 +1,125 @@
-import React, { useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from 'react-hook-form';
+import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
-import AppTextInput from '../../components/inputs/AppTextInput';
+// import { useDispatch } from 'react-redux';
+import * as yup from 'yup';
+import AppTextInputController from '../../components/inputs/AppTextInputController';
 import KeyboardAvoidingViewContainer from '../../components/KeyboardAvoidingViewContainer/KeyboardAvoidingViewContainer';
 import { colors } from '../../styles/colors';
 
 const PersonalInformationScreen = () => {
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [webpage, setWebpage] = useState('');
-  const [address, setAddress] = useState('');
-  const [zipCode, setZipCode] = useState('');
-  const [city, setCity] = useState('');
-  const [region, setRegion] = useState('');
-  const [country, setCountry] = useState('');
+  // const dispatch = useDispatch();
 
-  const scrollRef = useRef<ScrollView>(null);
+  const schema = yup
+    .object({
+      name: yup.string().required('Це поле обовʼязкове до заповнення'),
+      surname: yup.string().required('Це поле обовʼязкове до заповнення'),
+      email: yup.string().email('Невірний формат email'),
+      phone: yup.string(),
+      website: yup.string().url(),
+      address: yup.string(),
+      zipCode: yup.string(),
+      city: yup.string(),
+      region: yup.string(),
+      country: yup.string(),
+    })
+    .required();
+
+  type FormData = yup.InferType<typeof schema>;
+
+  const { control, handleSubmit } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: '',
+      surname: '',
+      email: '',
+      phone: '',
+      website: '',
+      address: '',
+      zipCode: '',
+      city: '',
+      region: '',
+      country: '',
+    },
+  });
+
+  const onSubmit = (data: FormData) => {
+    console.log('Form data:', data);
+  };
 
   return (
     <KeyboardAvoidingViewContainer>
       <ScrollView
-        style={{
-          flex: 1,
-          backgroundColor: colors.primary,
-        }}
+        style={styles.scrollView}
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <AppTextInput placeholder="Імʼя" value={name} onChangeText={setName} />
-        <AppTextInput
+        <AppTextInputController<FormData>
+          control={control}
+          name="name"
+          placeholder="Імʼя"
+        />
+        <AppTextInputController<FormData>
+          control={control}
+          name="surname"
           placeholder="Прізвище"
-          value={surname}
-          onChangeText={setSurname}
         />
         <Text style={styles.title}>Контактна інформація</Text>
-        <AppTextInput
+        <AppTextInputController<FormData>
+          control={control}
+          name="email"
           placeholder="Електронна пошта"
-          value={email}
-          onChangeText={setEmail}
         />
-        <AppTextInput
+        <AppTextInputController<FormData>
+          control={control}
+          name="phone"
           placeholder="Телефон"
-          value={phone}
-          onChangeText={setPhone}
         />
-        <AppTextInput
+        <AppTextInputController<FormData>
+          control={control}
+          name="website"
           placeholder="Веб-сторінка"
-          value={webpage}
-          onChangeText={setWebpage}
         />
         <Text style={styles.title}>Місцезнаходження</Text>
-        <AppTextInput
+        <AppTextInputController<FormData>
+          control={control}
+          name="address"
           placeholder="Адреса"
-          value={address}
-          onChangeText={setAddress}
         />
-        <AppTextInput
+        <AppTextInputController<FormData>
+          control={control}
+          name="zipCode"
           placeholder="Поштовий індекс"
-          value={zipCode}
-          onChangeText={setZipCode}
         />
-        <AppTextInput placeholder="Місто" value={city} onChangeText={setCity} />
-        <AppTextInput
+        <AppTextInputController<FormData>
+          control={control}
+          name="city"
+          placeholder="Місто"
+        />
+        <AppTextInputController<FormData>
+          control={control}
+          name="region"
           placeholder="Область"
-          value={region}
-          onChangeText={setRegion}
         />
-        <AppTextInput
+        <AppTextInputController<FormData>
+          control={control}
+          name="country"
           placeholder="Країна"
-          value={country}
-          onChangeText={setCountry}
         />
+        <Pressable onPress={handleSubmit(onSubmit)}>
+          <Text style={{ fontSize: 20, color: 'white' }}>Submit</Text>
+        </Pressable>
       </ScrollView>
     </KeyboardAvoidingViewContainer>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    backgroundColor: colors.primary,
+  },
   container: {
     flexGrow: 1,
     justifyContent: 'flex-start',
