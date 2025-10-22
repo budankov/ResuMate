@@ -2,35 +2,46 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
-// import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import AppTextInputController from '../../components/inputs/AppTextInputController';
 import KeyboardAvoidingViewContainer from '../../components/KeyboardAvoidingViewContainer/KeyboardAvoidingViewContainer';
+import { savePersonalInfo } from '../../store/slices/profileSlice';
+import { RootState } from '../../store/store';
 import { colors } from '../../styles/colors';
 
+const schema = yup
+  .object({
+    name: yup.string().required('Це поле обовʼязкове до заповнення'),
+    surname: yup.string().required('Це поле обовʼязкове до заповнення'),
+    email: yup.string().email('Невірний формат email'),
+    phone: yup.string(),
+    website: yup.string(),
+    address: yup.string(),
+    zipCode: yup.string(),
+    city: yup.string(),
+    region: yup.string(),
+    country: yup.string(),
+  })
+  .required();
+
+type FormData = yup.InferType<typeof schema>;
+
 const PersonalInformationScreen = () => {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-  const schema = yup
-    .object({
-      name: yup.string().required('Це поле обовʼязкове до заповнення'),
-      surname: yup.string().required('Це поле обовʼязкове до заповнення'),
-      email: yup.string().email('Невірний формат email'),
-      phone: yup.string(),
-      website: yup.string().url(),
-      address: yup.string(),
-      zipCode: yup.string(),
-      city: yup.string(),
-      region: yup.string(),
-      country: yup.string(),
-    })
-    .required();
+  const savedData = useSelector(
+    (state: RootState) => state.profile.personalInfo,
+  );
 
-  type FormData = yup.InferType<typeof schema>;
+  const onSubmit = (data: FormData) => {
+    dispatch(savePersonalInfo(data));
+    console.log('Form data:', data);
+  };
 
-  const { control, handleSubmit } = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: {
+  const { control, handleSubmit } = useForm<FormData>({
+    resolver: yupResolver(schema) as any,
+    defaultValues: savedData || {
       name: '',
       surname: '',
       email: '',
@@ -43,10 +54,6 @@ const PersonalInformationScreen = () => {
       country: '',
     },
   });
-
-  const onSubmit = (data: FormData) => {
-    console.log('Form data:', data);
-  };
 
   return (
     <KeyboardAvoidingViewContainer>
@@ -108,7 +115,7 @@ const PersonalInformationScreen = () => {
           placeholder="Країна"
         />
         <Pressable onPress={handleSubmit(onSubmit)}>
-          <Text style={{ fontSize: 20, color: 'white' }}>Submit</Text>
+          <Text style={{ fontSize: 20, color: 'white' }}>Зберегти дані</Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingViewContainer>
