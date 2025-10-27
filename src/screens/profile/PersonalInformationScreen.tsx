@@ -1,6 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
@@ -29,6 +31,7 @@ const schema = yup
 
 const PersonalInformationScreen = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const savedData = useSelector(
     (state: RootState) => state.profile.personalInfo,
@@ -48,23 +51,54 @@ const PersonalInformationScreen = () => {
     ...savedData,
   };
 
-  const { control, handleSubmit } = useForm<FormData>({
+  const { control, handleSubmit, formState, reset } = useForm<FormData>({
     resolver: yupResolver(schema) as any,
     defaultValues,
     shouldUnregister: false,
   });
 
-  const onSubmit = (data: FormData) => {
-    const cleanedData = Object.fromEntries(
-      Object.entries(data).map(([key, value]) => [
-        key,
-        typeof value === 'string' ? value.trim() || '' : value,
-      ]),
-    ) as FormData;
+  const onSubmit = useCallback(
+    (data: FormData) => {
+      const cleanedData = Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [
+          key,
+          typeof value === 'string' ? value.trim() || '' : value,
+        ]),
+      ) as FormData;
 
-    dispatch(savePersonalInfo(cleanedData));
-    console.log(cleanedData);
-  };
+      dispatch(savePersonalInfo(cleanedData));
+
+      Alert.alert('Ваші дані збережено', '', [
+        {
+          text: 'OK',
+          onPress: () => {
+            reset(cleanedData);
+          },
+        },
+      ]);
+
+      console.log(cleanedData);
+    },
+    [dispatch, reset],
+  );
+
+  const { isDirty } = formState;
+
+  useEffect(() => {
+  navigation.setParams({ isDirty });
+}, [isDirty]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: isDirty
+        ? () => (
+            <Pressable onPress={handleSubmit(onSubmit)}>
+              <Text style={styles.saveText}>Зберегти</Text>
+            </Pressable>
+          )
+        : undefined,
+    });
+  }, [navigation, handleSubmit, onSubmit, isDirty]);
 
   return (
     <KeyboardAvoidingViewContainer>
@@ -125,19 +159,6 @@ const PersonalInformationScreen = () => {
           name="country"
           placeholder="Країна"
         />
-        <Pressable
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? 'darkgreen' : 'green',
-              borderRadius: 10,
-              alignItems: 'center',
-              padding: 10,
-            },
-          ]}
-          onPress={handleSubmit(onSubmit)}
-        >
-          <Text style={{ fontSize: 20, color: 'white' }}>Зберегти дані</Text>
-        </Pressable>
       </ScrollView>
     </KeyboardAvoidingViewContainer>
   );
@@ -159,6 +180,10 @@ const styles = StyleSheet.create({
     fontSize: s(16),
     color: colors.fonts,
     paddingVertical: vs(10),
+    fontWeight: '700',
+  },
+  saveText: {
+    color: 'green',
     fontWeight: '700',
   },
 });
