@@ -125,7 +125,17 @@ const PersonalInformationScreen = () => {
           name="country"
           placeholder="Країна"
         />
-        <Pressable onPress={handleSubmit(onSubmit)}>
+        <Pressable
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed ? 'darkgreen' : 'green',
+              borderRadius: 10,
+              alignItems: 'center',
+              padding: 10,
+            },
+          ]}
+          onPress={handleSubmit(onSubmit)}
+        >
           <Text style={{ fontSize: 20, color: 'white' }}>Зберегти дані</Text>
         </Pressable>
       </ScrollView>
