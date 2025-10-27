@@ -10,6 +10,8 @@ import { savePersonalInfo } from '../../store/slices/profileSlice';
 import { RootState } from '../../store/store';
 import { colors } from '../../styles/colors';
 
+type FormData = yup.InferType<typeof schema>;
+
 const schema = yup
   .object({
     name: yup.string().required('Це поле обовʼязкове до заповнення'),
@@ -25,8 +27,6 @@ const schema = yup
   })
   .required();
 
-type FormData = yup.InferType<typeof schema>;
-
 const PersonalInformationScreen = () => {
   const dispatch = useDispatch();
 
@@ -34,26 +34,37 @@ const PersonalInformationScreen = () => {
     (state: RootState) => state.profile.personalInfo,
   );
 
-  const onSubmit = (data: FormData) => {
-    dispatch(savePersonalInfo(data));
-    console.log('Form data:', data);
+  const defaultValues: FormData = {
+    name: '',
+    surname: '',
+    email: '',
+    phone: '',
+    website: '',
+    address: '',
+    zipCode: '',
+    city: '',
+    region: '',
+    country: '',
+    ...savedData,
   };
 
   const { control, handleSubmit } = useForm<FormData>({
     resolver: yupResolver(schema) as any,
-    defaultValues: savedData || {
-      name: '',
-      surname: '',
-      email: '',
-      phone: '',
-      website: '',
-      address: '',
-      zipCode: '',
-      city: '',
-      region: '',
-      country: '',
-    },
+    defaultValues,
+    shouldUnregister: false,
   });
+
+  const onSubmit = (data: FormData) => {
+    const cleanedData = Object.fromEntries(
+      Object.entries(data).map(([key, value]) => [
+        key,
+        typeof value === 'string' ? value.trim() || '' : value,
+      ]),
+    ) as FormData;
+
+    dispatch(savePersonalInfo(cleanedData));
+    console.log(cleanedData);
+  };
 
   return (
     <KeyboardAvoidingViewContainer>
