@@ -6,6 +6,8 @@ import { colors } from '../../styles/colors';
 interface AppTextInputProps {
   value: string;
   onChangeText: (text: string) => void;
+  onFocus?: (e: any) => void;
+  onBlur?: (e: any) => void;
   placeholder: string;
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'email-address' | 'numeric';
@@ -17,6 +19,8 @@ interface AppTextInputProps {
 const AppTextInput: React.FC<AppTextInputProps> = ({
   value,
   onChangeText,
+  onFocus,
+  onBlur,
   placeholder,
   secureTextEntry,
   keyboardType,
@@ -31,6 +35,8 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
       <TextInput
         value={value}
         onChangeText={onChangeText}
+        onFocus={onFocus}
+        onBlur={onBlur}
         placeholder={placeholder}
         placeholderTextColor={placeholderTextColor || 'gray'}
         secureTextEntry={showPassword ? isHidden : secureTextEntry}

@@ -85,8 +85,8 @@ const PersonalInformationScreen = () => {
   const { isDirty } = formState;
 
   useEffect(() => {
-  navigation.setParams({ isDirty });
-}, [isDirty]);
+    navigation.setParams({ isDirty });
+  }, [isDirty]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -183,7 +183,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   saveText: {
-    color: 'green',
+    fontSize: s(13),
+    color: colors.yellow,
     fontWeight: '700',
   },
 });

@@ -42,12 +42,20 @@ const CustomHeader: FC<CustomHeaderProps> = ({
 
   return (
     <View style={styles.header}>
-      {back && (
-        <Pressable onPress={handleBackPress}>
-          <ChevronLeftIcon size={30} color={colors.fonts} />
-        </Pressable>
-      )}
-      <Text style={styles.title}>{title}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {back && (
+          <Pressable onPress={handleBackPress}>
+            <ChevronLeftIcon size={30} color={colors.fonts} />
+          </Pressable>
+        )}
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          style={[styles.title, isDirty && { maxWidth: '70%' }]}
+        >
+          {title}
+        </Text>
+      </View>
       {headerRight}
     </View>
   );
@@ -59,6 +67,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: s(16),
   },
   back: {

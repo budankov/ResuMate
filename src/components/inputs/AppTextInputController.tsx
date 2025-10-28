@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import { StyleSheet, Text } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
+import { colors } from '../../styles/colors';
 import AppTextInput from './AppTextInput';
 
 interface AppTextInputControllerProps<T extends FieldValues> {
@@ -26,6 +28,8 @@ const AppTextInputController = <T extends FieldValues>({
   styleInput,
   showPassword,
 }: AppTextInputControllerProps<T>) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <Controller
       control={control}
@@ -36,12 +40,18 @@ const AppTextInputController = <T extends FieldValues>({
           <AppTextInput
             value={value}
             onChangeText={onChange}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             placeholder={placeholder}
             placeholderTextColor={placeholderTextColor}
             secureTextEntry={secureTextEntry}
             keyboardType={keyboardType}
             showPassword={showPassword}
-            style={[styleInput, error ? styles.errorInput : undefined]}
+            style={[
+              styleInput,
+              isFocused && styles.focusedInput,
+              error && styles.errorInput,
+            ]}
           />
           {error && <Text style={styles.textError}>{error.message}</Text>}
         </>
@@ -51,6 +61,9 @@ const AppTextInputController = <T extends FieldValues>({
 };
 
 const styles = StyleSheet.create({
+  focusedInput: {
+    borderColor: colors.yellow,
+  },
   errorInput: {
     borderColor: 'red',
   },
