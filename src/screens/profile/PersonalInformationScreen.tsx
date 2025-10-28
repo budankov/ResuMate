@@ -1,38 +1,32 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { Alert, Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
+import FormLayout from '../../components/forms/FormLayout';
 import AppTextInputController from '../../components/inputs/AppTextInputController';
-import KeyboardAvoidingViewContainer from '../../components/KeyboardAvoidingViewContainer/KeyboardAvoidingViewContainer';
+import { useFormHandler } from '../../hooks/useFormHandler';
 import { savePersonalInfo } from '../../store/slices/profileSlice';
 import { RootState } from '../../store/store';
 import { colors } from '../../styles/colors';
 
-type FormData = yup.InferType<typeof schema>;
+const schema = yup.object({
+  name: yup.string().required('Це поле обовʼязкове до заповнення'),
+  surname: yup.string().required('Це поле обовʼязкове до заповнення'),
+  email: yup.string().email('Невірний формат email'),
+  phone: yup.string(),
+  website: yup.string(),
+  address: yup.string(),
+  zipCode: yup.string(),
+  city: yup.string(),
+  region: yup.string(),
+  country: yup.string(),
+});
 
-const schema = yup
-  .object({
-    name: yup.string().required('Це поле обовʼязкове до заповнення'),
-    surname: yup.string().required('Це поле обовʼязкове до заповнення'),
-    email: yup.string().email('Невірний формат email'),
-    phone: yup.string(),
-    website: yup.string(),
-    address: yup.string(),
-    zipCode: yup.string(),
-    city: yup.string(),
-    region: yup.string(),
-    country: yup.string(),
-  })
-  .required();
+type FormData = yup.InferType<typeof schema>;
 
 const PersonalInformationScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation();
-
   const savedData = useSelector(
     (state: RootState) => state.profile.personalInfo,
   );
@@ -51,140 +45,75 @@ const PersonalInformationScreen = () => {
     ...savedData,
   };
 
-  const { control, handleSubmit, formState, reset } = useForm<FormData>({
-    resolver: yupResolver(schema) as any,
+  const { control } = useFormHandler<FormData>({
+    schema,
     defaultValues,
-    shouldUnregister: false,
+    onSave: data => dispatch(savePersonalInfo(data)),
   });
 
-  const onSubmit = useCallback(
-    (data: FormData) => {
-      const cleanedData = Object.fromEntries(
-        Object.entries(data).map(([key, value]) => [
-          key,
-          typeof value === 'string' ? value.trim() || '' : value,
-        ]),
-      ) as FormData;
-
-      dispatch(savePersonalInfo(cleanedData));
-
-      Alert.alert('Ваші дані збережено', '', [
-        {
-          text: 'OK',
-          onPress: () => {
-            reset(cleanedData);
-          },
-        },
-      ]);
-
-      console.log(cleanedData);
-    },
-    [dispatch, reset],
-  );
-
-  const { isDirty } = formState;
-
-  useEffect(() => {
-    navigation.setParams({ isDirty });
-  }, [isDirty]);
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: isDirty
-        ? () => (
-            <Pressable onPress={handleSubmit(onSubmit)}>
-              <Text style={styles.saveText}>Зберегти</Text>
-            </Pressable>
-          )
-        : undefined,
-    });
-  }, [navigation, handleSubmit, onSubmit, isDirty]);
-
   return (
-    <KeyboardAvoidingViewContainer>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <AppTextInputController<FormData>
-          control={control}
-          name="name"
-          placeholder="Імʼя"
-        />
-        <AppTextInputController<FormData>
-          control={control}
-          name="surname"
-          placeholder="Прізвище"
-        />
-        <Text style={styles.title}>Контактна інформація</Text>
-        <AppTextInputController<FormData>
-          control={control}
-          name="email"
-          placeholder="Електронна пошта"
-        />
-        <AppTextInputController<FormData>
-          control={control}
-          name="phone"
-          placeholder="Телефон"
-        />
-        <AppTextInputController<FormData>
-          control={control}
-          name="website"
-          placeholder="Веб-сторінка"
-        />
-        <Text style={styles.title}>Місцезнаходження</Text>
-        <AppTextInputController<FormData>
-          control={control}
-          name="address"
-          placeholder="Адреса"
-        />
-        <AppTextInputController<FormData>
-          control={control}
-          name="zipCode"
-          placeholder="Поштовий індекс"
-        />
-        <AppTextInputController<FormData>
-          control={control}
-          name="city"
-          placeholder="Місто"
-        />
-        <AppTextInputController<FormData>
-          control={control}
-          name="region"
-          placeholder="Область"
-        />
-        <AppTextInputController<FormData>
-          control={control}
-          name="country"
-          placeholder="Країна"
-        />
-      </ScrollView>
-    </KeyboardAvoidingViewContainer>
+    <FormLayout>
+      <AppTextInputController
+        control={control}
+        name="name"
+        placeholder="Імʼя"
+      />
+      <AppTextInputController
+        control={control}
+        name="surname"
+        placeholder="Прізвище"
+      />
+      <Text style={styles.title}>Контактна інформація</Text>
+      <AppTextInputController
+        control={control}
+        name="email"
+        placeholder="Електронна пошта"
+      />
+      <AppTextInputController
+        control={control}
+        name="phone"
+        placeholder="Телефон"
+      />
+      <AppTextInputController
+        control={control}
+        name="website"
+        placeholder="Веб-сторінка"
+      />
+      <Text style={styles.title}>Місцезнаходження</Text>
+      <AppTextInputController
+        control={control}
+        name="address"
+        placeholder="Адреса"
+      />
+      <AppTextInputController
+        control={control}
+        name="zipCode"
+        placeholder="Поштовий індекс"
+      />
+      <AppTextInputController
+        control={control}
+        name="city"
+        placeholder="Місто"
+      />
+      <AppTextInputController
+        control={control}
+        name="region"
+        placeholder="Область"
+      />
+      <AppTextInputController
+        control={control}
+        name="country"
+        placeholder="Країна"
+      />
+    </FormLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-    backgroundColor: colors.primary,
-  },
-  container: {
-    flexGrow: 1,
-    justifyContent: 'flex-start',
-    backgroundColor: colors.primary,
-    paddingHorizontal: s(10),
-    paddingVertical: vs(20),
-  },
   title: {
     fontSize: s(16),
     color: colors.fonts,
     paddingVertical: vs(10),
-    fontWeight: '700',
-  },
-  saveText: {
-    fontSize: s(13),
-    color: colors.yellow,
     fontWeight: '700',
   },
 });
