@@ -24,10 +24,6 @@ const schema = yup.object({
 type FormData = yup.InferType<typeof schema>;
 
 const WorkExperienceScreen = () => {
-  const [date, setDate] = useState(new Date());
-  console.log('дата', date);
-  const [open, setOpen] = useState(false);
-
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
