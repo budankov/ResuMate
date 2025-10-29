@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface PersonalInfo {
-  name?: string;
-  surname?: string;
+  name: string;
+  surname: string;
   email?: string;
   phone?: string;
   website?: string;
@@ -18,12 +18,14 @@ interface ProfessionalGoals {
   summary?: string;
 }
 
-interface Experience {
-  company: string;
+interface WorkExperience {
   position: string;
-  startDate: string;
+  company: string;
+  location?: string;
+  website?: string;
+  responsibilities?: string;
+  startDate?: string;
   endDate?: string;
-  description?: string;
 }
 
 interface Education {
@@ -36,7 +38,7 @@ interface Education {
 interface ResumeState {
   personalInfo: PersonalInfo;
   professionalGoals: ProfessionalGoals;
-  experiences: Experience[];
+  workExperience: WorkExperience[];
   education: Education[];
   skills: string[];
   languages: string[];
@@ -46,7 +48,7 @@ interface ResumeState {
 const initialState: ResumeState = {
   personalInfo: {},
   professionalGoals: {},
-  experiences: [],
+  workExperience: [],
   education: [],
   skills: [],
   languages: [],
@@ -69,8 +71,8 @@ const profileSlice = createSlice({
         ...action.payload,
       };
     },
-    saveExperience: (state, action: PayloadAction<Experience[]>) => {
-      state.experiences = action.payload;
+    saveWorkExperience: (state, action: PayloadAction<WorkExperience[]>) => {
+      state.workExperience = action.payload;
     },
     saveEducation: (state, action: PayloadAction<Education[]>) => {
       state.education = action.payload;
@@ -90,7 +92,7 @@ const profileSlice = createSlice({
 export const {
   savePersonalInfo,
   saveProfessionalGoals,
-  saveExperience,
+  saveWorkExperience,
   saveEducation,
   saveSkills,
   saveLanguages,
