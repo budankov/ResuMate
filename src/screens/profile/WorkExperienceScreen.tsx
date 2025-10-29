@@ -93,7 +93,7 @@ const WorkExperienceScreen = () => {
       <View style={styles.switchContainer}>
         <Text style={styles.switchTitle}>Це ваша поточна посада?</Text>
         <Switch
-          trackColor={{ false: '#767577', true: '#767577' }}
+          trackColor={{ false: '#767577', true: '#3e3e3e' }}
           thumbColor={isEnabled ? colors.yellow : '#f4f3f4'}
           ios_backgroundColor="#3e3e3e"
           onValueChange={toggleSwitch}

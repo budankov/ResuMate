@@ -32,7 +32,10 @@ const AppDatePickerController = <T extends FieldValues>({
           {label && <Text style={styles.label}>{label}</Text>}
 
           <Pressable
-            style={styles.inputContainer}
+            style={({ pressed }) => [
+              styles.inputContainer,
+              pressed && { borderColor: colors.yellow },
+            ]}
             onPress={() => setOpen(true)}
           >
             <CalendarIcon color={colors.fonts} size={20} />
@@ -76,12 +79,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    backgroundColor: colors.primary,
     borderColor: 'rgba(255,255,255,0.25)',
     borderWidth: 2,
     borderRadius: s(16),
     paddingHorizontal: s(12),
     paddingVertical: vs(12),
-    backgroundColor: colors.primary,
     marginVertical: vs(4),
   },
   text: {
