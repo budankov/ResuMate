@@ -9,6 +9,8 @@ interface AppTextInputControllerProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   rules?: object;
+  multiline?: boolean;
+scrollEnabled?: boolean;
   placeholder: string;
   placeholderTextColor?: string;
   secureTextEntry?: boolean;
@@ -21,6 +23,8 @@ const AppTextInputController = <T extends FieldValues>({
   control,
   name,
   rules,
+  multiline,
+  scrollEnabled,
   placeholder,
   placeholderTextColor,
   secureTextEntry,
@@ -42,6 +46,8 @@ const AppTextInputController = <T extends FieldValues>({
             onChangeText={onChange}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            multiline={multiline}
+            scrollEnabled={scrollEnabled}
             placeholder={placeholder}
             placeholderTextColor={placeholderTextColor}
             secureTextEntry={secureTextEntry}

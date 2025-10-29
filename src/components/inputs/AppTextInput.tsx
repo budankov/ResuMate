@@ -8,6 +8,8 @@ interface AppTextInputProps {
   onChangeText: (text: string) => void;
   onFocus?: (e: any) => void;
   onBlur?: (e: any) => void;
+  multiline?: boolean;
+  scrollEnabled?: boolean;
   placeholder: string;
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'email-address' | 'numeric';
@@ -21,6 +23,8 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
   onChangeText,
   onFocus,
   onBlur,
+  multiline,
+  scrollEnabled,
   placeholder,
   secureTextEntry,
   keyboardType,
@@ -37,6 +41,8 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
         onChangeText={onChangeText}
         onFocus={onFocus}
         onBlur={onBlur}
+        multiline={multiline}
+        scrollEnabled={scrollEnabled}
         placeholder={placeholder}
         placeholderTextColor={placeholderTextColor || 'gray'}
         secureTextEntry={showPassword ? isHidden : secureTextEntry}

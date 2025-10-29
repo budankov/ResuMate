@@ -13,6 +13,11 @@ interface PersonalInfo {
   country?: string;
 }
 
+interface ProfessionalGoals {
+  position?: string;
+  summary?: string;
+}
+
 interface Experience {
   company: string;
   position: string;
@@ -30,6 +35,7 @@ interface Education {
 
 interface ResumeState {
   personalInfo: PersonalInfo;
+  professionalGoals: ProfessionalGoals;
   experiences: Experience[];
   education: Education[];
   skills: string[];
@@ -39,6 +45,7 @@ interface ResumeState {
 
 const initialState: ResumeState = {
   personalInfo: {},
+  professionalGoals: {},
   experiences: [],
   education: [],
   skills: [],
@@ -52,6 +59,15 @@ const profileSlice = createSlice({
   reducers: {
     savePersonalInfo: (state, action: PayloadAction<PersonalInfo>) => {
       state.personalInfo = { ...state.personalInfo, ...action.payload };
+    },
+    saveProfessionalGoals: (
+      state,
+      action: PayloadAction<ProfessionalGoals>,
+    ) => {
+      state.professionalGoals = {
+        ...state.professionalGoals,
+        ...action.payload,
+      };
     },
     saveExperience: (state, action: PayloadAction<Experience[]>) => {
       state.experiences = action.payload;
@@ -73,6 +89,7 @@ const profileSlice = createSlice({
 
 export const {
   savePersonalInfo,
+  saveProfessionalGoals,
   saveExperience,
   saveEducation,
   saveSkills,

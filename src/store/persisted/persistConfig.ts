@@ -12,7 +12,7 @@ const languagePersistConfig = {
 const profilePersistConfig = {
   key: 'profile',
   storage: AsyncStorage,
-  whitelist: ['personalInfo'],
+  // whitelist: ['personalInfo'],
 };
 
 export const persistedLanguageSlice = persistReducer(
