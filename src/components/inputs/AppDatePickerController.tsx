@@ -30,7 +30,7 @@ const AppDatePickerController = <T extends FieldValues>({
       render={({ field: { onChange, value } }) => (
         <>
           {label && <Text style={styles.label}>{label}</Text>}
-
+          <Text style={{ color: 'white' }}>{value}</Text>
           <Pressable
             style={({ pressed }) => [
               styles.inputContainer,
