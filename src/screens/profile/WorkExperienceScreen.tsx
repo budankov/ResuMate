@@ -1,9 +1,11 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
+import { SheetManager } from 'react-native-actions-sheet';
 import { s } from 'react-native-size-matters';
 import EditIcon from '../../assets/icons/EditIcon';
 import AddButton from '../../components/buttons/AddButton';
 import CardItem from '../../components/card/CardItem';
+import WorkExperienceForm from '../../components/forms/WorkExperienceForm';
 import { colors } from '../../styles/colors';
 
 const experienceList = [
@@ -40,7 +42,7 @@ const WorkExperienceScreen = () => {
   };
 
   const addExperience = () => {
-    console.log('addExperience');
+    SheetManager.show('WORK_EXPERIENCE_SHEET');
   };
 
   return (
@@ -64,6 +66,7 @@ const WorkExperienceScreen = () => {
         onPress={addExperience}
         children={<EditIcon />}
       />
+      <WorkExperienceForm />
     </View>
   );
 };

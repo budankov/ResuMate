@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     marginBottom: vs(4),
   },
   inputContainer: {
+    width: '100%',
     height: vs(40),
     flexDirection: 'row',
     alignItems: 'center',
