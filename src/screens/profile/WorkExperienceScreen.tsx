@@ -1,122 +1,78 @@
-import React, { useState } from 'react';
-import { StyleSheet, Switch, Text, View } from 'react-native';
-import { s, vs } from 'react-native-size-matters';
-import { useDispatch, useSelector } from 'react-redux';
-import * as yup from 'yup';
-import FormLayout from '../../components/forms/FormLayout';
-import AppDatePickerController from '../../components/inputs/AppDatePickerController';
-import AppTextInputController from '../../components/inputs/AppTextInputController';
-import { useFormHandler } from '../../hooks/useFormHandler';
-import { saveWorkExperience } from '../../store/slices/profileSlice';
-import { RootState } from '../../store/store';
+import React from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { s } from 'react-native-size-matters';
+import EditIcon from '../../assets/icons/EditIcon';
+import AddButton from '../../components/buttons/AddButton';
+import CardItem from '../../components/card/CardItem';
 import { colors } from '../../styles/colors';
 
-const schema = yup.object({
-  position: yup.string().required('Це поле обовʼязкове до заповнення'),
-  company: yup.string(),
-  location: yup.string(),
-  website: yup.string(),
-  responsibilities: yup.string(),
-  startDate: yup.string(),
-  endDate: yup.string(),
-});
-
-type FormData = yup.InferType<typeof schema>;
+const experienceList = [
+  {
+    id: 1,
+    position: 'React Native',
+    company: 'Google',
+    startDate: '22.10.2005',
+    endDate: '22.10.2015',
+  },
+  {
+    id: 2,
+    position: 'FrontEnd Developer',
+    company: 'Facebook',
+    startDate: '11.10.2010',
+    endDate: '13.12.2019',
+  },
+  {
+    id: 3,
+    position: 'BackEnd Developer',
+    company: 'Amazon',
+    startDate: '15.11.2015',
+    endDate: '',
+  },
+];
 
 const WorkExperienceScreen = () => {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-
-  const dispatch = useDispatch();
-  const savedData = useSelector(
-    (state: RootState) => state.profile.workExperience,
-  );
-
-  const defaultValues: FormData = {
-    position: '',
-    company: '',
-    location: '',
-    website: '',
-    responsibilities: '',
-    startDate: '',
-    endDate: '',
-    ...savedData,
+  const editCard = () => {
+    console.log('editCard');
   };
 
-  const { control } = useFormHandler<FormData>({
-    schema,
-    defaultValues,
-    onSave: data => dispatch(saveWorkExperience(data)),
-  });
+  const deleteCard = () => {
+    console.log('deleteCard');
+  };
+
+  const addExperience = () => {
+    console.log('addExperience');
+  };
 
   return (
-    <FormLayout>
-      <AppTextInputController
-        control={control}
-        name="position"
-        placeholder="Посада"
+    <View style={styles.container}>
+      <FlatList
+        data={experienceList}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <CardItem
+            title={item.position}
+            subTitle={item.company}
+            startDate={item.startDate}
+            endDate={item.endDate}
+            editCard={editCard}
+            deleteCard={deleteCard}
+          />
+        )}
       />
-      <AppTextInputController
-        control={control}
-        name="company"
-        placeholder="Назва компанії"
+      <AddButton
+        title="Додати досвід"
+        onPress={addExperience}
+        children={<EditIcon />}
       />
-      <AppTextInputController
-        control={control}
-        name="location"
-        placeholder="Місце знаходження"
-      />
-      <AppTextInputController
-        control={control}
-        name="website"
-        placeholder="Веб-сторінка"
-      />
-      <AppTextInputController
-        control={control}
-        name="responsibilities"
-        placeholder="Обовязки"
-        multiline
-        scrollEnabled
-        styleInput={[{ height: vs(150) }]}
-      />
-
-      <AppDatePickerController
-        control={control}
-        name="startDate"
-        placeholder="Дата працевлаштування"
-      />
-
-      <View style={styles.switchContainer}>
-        <Text style={styles.switchTitle}>Це ваша поточна посада?</Text>
-        <Switch
-          trackColor={{ false: '#767577', true: '#3e3e3e' }}
-          thumbColor={isEnabled ? colors.yellow : '#f4f3f4'}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
-          value={isEnabled}
-        />
-      </View>
-      {!isEnabled && (
-        <AppDatePickerController
-          control={control}
-          name="endDate"
-          placeholder="Дата звільнення"
-        />
-      )}
-    </FormLayout>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: vs(5),
-  },
-  switchTitle: {
-    color: colors.fonts,
-    fontSize: s(14),
+  container: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    paddingHorizontal: s(10),
   },
 });
 
