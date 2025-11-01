@@ -9,6 +9,11 @@ import FormLayout from '../../components/forms/FormLayout';
 import AppDatePickerController from '../../components/inputs/AppDatePickerController';
 import AppTextInputController from '../../components/inputs/AppTextInputController';
 import { useFormHandler } from '../../hooks/useFormHandler';
+import {
+  addCard,
+  closeEditor,
+  updateCard,
+} from '../../store/slices/cardsSlice';
 import { saveWorkExperience } from '../../store/slices/profileSlice';
 import { RootState } from '../../store/store';
 import { colors } from '../../styles/colors';
@@ -31,8 +36,10 @@ const WorkExperienceForm = () => {
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
   const dispatch = useDispatch();
-  const savedData = useSelector(
-    (state: RootState) => state.profile.workExperience,
+
+  const editing = useSelector((state: RootState) => state.cards.editing);
+  const experienceList = useSelector(
+    (state: RootState) => state.cards.records?.workExperience || [],
   );
 
   const defaultValues: FormData = {
@@ -43,16 +50,42 @@ const WorkExperienceForm = () => {
     responsibilities: '',
     startDate: '',
     endDate: '',
-    ...savedData,
   };
 
-  const { control } = useFormHandler<FormData>({
+  const { control, handleSubmit, onSubmit, reset } = useFormHandler<FormData>({
     schema,
     defaultValues,
-    onSave: data => dispatch(saveWorkExperience(data)),
+    onSave: () => {},
   });
 
-  const handleConfirm = () => {
+  React.useEffect(() => {
+    if (editing && editing.card) {
+      reset(editing.card.data as FormData);
+    } else {
+      reset(defaultValues as FormData);
+    }
+  }, [editing, reset]);
+
+  const handleConfirm = (data: FormData) => {
+    const namespace = 'workExperience';
+
+    const current = experienceList.map((c: any) => c.data);
+    let newPayload: any[] = [];
+
+    if (editing && editing.card) {
+      newPayload = current.map((d: any, idx: number) =>
+        experienceList[idx].id === editing.card!.id ? data : d,
+      );
+      dispatch(updateCard({ namespace, id: editing.card.id, data }));
+    } else {
+      newPayload = [...current, data];
+      dispatch(addCard({ namespace, card: { data } }));
+    }
+
+    // Persist updated list into profile slice
+    dispatch(saveWorkExperience(newPayload));
+
+    dispatch(closeEditor());
     SheetManager.hide('WORK_EXPERIENCE_SHEET');
   };
   const insets = useSafeAreaInsets();
@@ -63,7 +96,6 @@ const WorkExperienceForm = () => {
       gestureEnabled
       safeAreaInsets={insets}
       drawUnderStatusBar
-      scrollEnabled={true}
       indicatorStyle={{
         width: 150,
       }}
@@ -128,7 +160,10 @@ const WorkExperienceForm = () => {
           )}
         </FormLayout>
         <View style={{ paddingHorizontal: s(10) }}>
-          <AddButton onPress={handleConfirm} title="Додати досвід" />
+          <AddButton
+            onPress={handleSubmit(handleConfirm)}
+            title="Додати досвід"
+          />
         </View>
       </View>
     </ActionSheet>

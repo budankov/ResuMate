@@ -12,19 +12,19 @@ export function useFormHandler<FormType>({
   onSave,
 }: {
   schema: any;
-  defaultValues: FormType;
-  onSave: (data: FormType) => void;
+  defaultValues: any;
+  onSave: (data: any) => void;
 }) {
   const navigation = useNavigation<any>();
 
-  const { control, handleSubmit, formState, reset } = useForm<FormType>({
+  const { control, handleSubmit, formState, reset } = useForm<any>({
     resolver: yupResolver(schema) as any,
     defaultValues,
     shouldUnregister: false,
   });
 
   const onSubmit = useCallback(
-    (data: FormType) => {
+    (data: any) => {
       Keyboard.dismiss();
       const cleanedData = Object.fromEntries(
         Object.entries(data).map(([key, value]) => [
@@ -72,5 +72,5 @@ export function useFormHandler<FormType>({
     },
   });
 
-  return { control, handleSubmit, onSubmit, isDirty };
+  return { control, handleSubmit, onSubmit, isDirty, reset };
 }

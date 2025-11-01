@@ -9,6 +9,7 @@ import {
   REHYDRATE,
 } from 'redux-persist';
 import {
+  persistedCardsSlice,
   persistedLanguageSlice,
   persistedProfileSlice,
 } from './persisted/persistConfig';
@@ -19,6 +20,7 @@ export const store = configureStore({
     language: persistedLanguageSlice,
     profile: persistedProfileSlice,
     userSlice,
+    cards: persistedCardsSlice,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

@@ -1,49 +1,60 @@
+import { nanoid } from '@reduxjs/toolkit';
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { s } from 'react-native-size-matters';
+import { useDispatch, useSelector } from 'react-redux';
 import EditIcon from '../../assets/icons/EditIcon';
 import AddButton from '../../components/buttons/AddButton';
 import CardItem from '../../components/card/CardItem';
 import WorkExperienceForm from '../../components/forms/WorkExperienceForm';
+import {
+  openEditor,
+  removeCard,
+  setCards,
+} from '../../store/slices/cardsSlice';
+import { saveWorkExperience } from '../../store/slices/profileSlice';
+import { RootState } from '../../store/store';
 import { colors } from '../../styles/colors';
 
-const experienceList = [
-  {
-    id: 1,
-    position: 'React Native',
-    company: 'Google',
-    startDate: '22.10.2005',
-    endDate: '22.10.2015',
-  },
-  {
-    id: 2,
-    position: 'FrontEnd Developer',
-    company: 'Facebook',
-    startDate: '11.10.2010',
-    endDate: '13.12.2019',
-  },
-  {
-    id: 3,
-    position: 'BackEnd Developer',
-    company: 'Amazon',
-    startDate: '15.11.2015',
-    endDate: '',
-  },
-];
-
 const WorkExperienceScreen = () => {
-  const editCard = () => {
-    console.log('editCard');
+  const dispatch = useDispatch();
+
+  const experienceList = useSelector(
+    (state: RootState) => state.cards.records?.workExperience || [],
+  );
+  const profile = useSelector((state: RootState) => state.profile);
+
+  const editCard = (card: any) => {
+    dispatch(openEditor({ namespace: 'workExperience', card }));
+    SheetManager.show('WORK_EXPERIENCE_SHEET');
   };
 
-  const deleteCard = () => {
-    console.log('deleteCard');
+  const deleteCardHandler = (id: string) => {
+    const newPayload = experienceList
+      .filter((c: any) => c.id !== id)
+      .map((c: any) => c.data);
+    dispatch(removeCard({ namespace: 'workExperience', id }));
+    dispatch(saveWorkExperience(newPayload));
   };
 
   const addExperience = () => {
+    dispatch(openEditor({ namespace: 'workExperience', card: null }));
     SheetManager.show('WORK_EXPERIENCE_SHEET');
   };
+
+  React.useEffect(() => {
+    if (
+      (experienceList || []).length === 0 &&
+      (profile?.workExperience || []).length > 0
+    ) {
+      const mapped = (profile.workExperience || []).map(item => ({
+        id: nanoid(),
+        data: item,
+      }));
+      dispatch(setCards({ namespace: 'workExperience', cards: mapped }));
+    }
+  }, [dispatch, experienceList, profile?.workExperience]);
 
   return (
     <View style={styles.container}>
@@ -52,12 +63,12 @@ const WorkExperienceScreen = () => {
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <CardItem
-            title={item.position}
-            subTitle={item.company}
-            startDate={item.startDate}
-            endDate={item.endDate}
-            editCard={editCard}
-            deleteCard={deleteCard}
+            title={item.data.position}
+            subTitle={item.data.company}
+            startDate={item.data.startDate}
+            endDate={item.data.endDate}
+            editCard={() => editCard(item)}
+            deleteCard={() => deleteCardHandler(item.id)}
           />
         )}
       />
