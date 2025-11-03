@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Controller, useWatch } from 'react-hook-form';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 import ActionSheet, { SheetManager } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,22 +20,7 @@ import { RootState } from '../../store/store';
 import { colors } from '../../styles/colors';
 import AddButton from '../buttons/AddButton';
 
-const schema = yup.object({
-  position: yup.string().required('Це поле обовʼязкове до заповнення'),
-  company: yup.string(),
-  location: yup.string(),
-  website: yup.string(),
-  responsibilities: yup.string(),
-  startDate: yup.string(),
-  endDate: yup.string(),
-});
-
-type FormData = yup.InferType<typeof schema>;
-
 const WorkExperienceForm = () => {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-
   const dispatch = useDispatch();
 
   const editing = useSelector((state: RootState) => state.cards.editing);
@@ -42,15 +28,37 @@ const WorkExperienceForm = () => {
     (state: RootState) => state.cards.records?.workExperience || [],
   );
 
-  const defaultValues: FormData = {
-    position: '',
-    company: '',
-    location: '',
-    website: '',
-    responsibilities: '',
-    startDate: '',
-    endDate: '',
-  };
+  const schema = yup.object({
+    position: yup.string().required('Це поле обовʼязкове до заповнення'),
+    company: yup.string().required('Це поле обовʼязкове до заповнення'),
+    location: yup.string(),
+    website: yup.string(),
+    responsibilities: yup.string(),
+    startDate: yup.string().required('Це поле обовʼязкове до заповнення'),
+    isEnabled: yup.boolean(),
+    endDate: yup.string().when('isEnabled', {
+      is: false,
+      then: schemaField =>
+        schemaField.required('Це поле обовʼязкове до заповнення'),
+      otherwise: schemaField => schemaField.notRequired(),
+    }),
+  });
+
+  type FormData = yup.InferType<typeof schema>;
+
+  const defaultValues = React.useMemo<FormData>(
+    () => ({
+      position: '',
+      company: '',
+      location: '',
+      website: '',
+      responsibilities: '',
+      startDate: '',
+      endDate: '',
+      isEnabled: false,
+    }),
+    [],
+  );
 
   const { control, handleSubmit, reset } = useFormHandler<FormData>({
     schema,
@@ -58,13 +66,23 @@ const WorkExperienceForm = () => {
     onSave: () => {},
   });
 
+  const isEnabled = useWatch({
+    control,
+    name: 'isEnabled',
+    defaultValue: defaultValues.isEnabled,
+  }) as boolean;
+
   React.useEffect(() => {
-    if (editing && editing.card) {
-      reset(editing.card.data as FormData);
-    } else {
-      reset(defaultValues as FormData);
-    }
-  }, [editing, reset]);
+    const values: FormData =
+      editing && editing.card
+        ? ({
+            ...(editing.card.data as FormData),
+            isEnabled: (editing.card.data as any)?.isEnabled ?? false,
+          } as FormData)
+        : (defaultValues as FormData);
+
+    reset(values);
+  }, [editing, reset, defaultValues]);
 
   const handleConfirm = (data: FormData) => {
     const namespace = 'workExperience';
@@ -82,7 +100,6 @@ const WorkExperienceForm = () => {
       dispatch(addCard({ namespace, card: { data } }));
     }
 
-    // Persist updated list into profile slice
     dispatch(saveWorkExperience(newPayload));
 
     dispatch(closeEditor());
@@ -143,12 +160,20 @@ const WorkExperienceForm = () => {
 
           <View style={styles.switchContainer}>
             <Text style={styles.switchTitle}>Це ваша поточна посада?</Text>
-            <Switch
-              trackColor={{ false: '#767577', true: '#3e3e3e' }}
-              thumbColor={isEnabled ? colors.yellow : '#f4f3f4'}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSwitch}
-              value={isEnabled}
+            <Controller
+              control={control}
+              name="isEnabled"
+              render={({ field: { value, onChange } }) => (
+                <Switch
+                  trackColor={{ false: '#767577', true: '#3e3e3e' }}
+                  thumbColor={value ? colors.yellow : '#f4f3f4'}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={val => {
+                    onChange(val);
+                  }}
+                  value={!!value}
+                />
+              )}
             />
           </View>
           {!isEnabled && (
