@@ -49,7 +49,7 @@ const AppDatePickerController = <T extends FieldValues>({
     <Controller
       control={control}
       name={name}
-      render={({ field: { onChange, value } }) => (
+      render={({ field: { onChange, value }, fieldState: { error } }) => (
         <>
           {label && <Text style={styles.label}>{label}</Text>}
           <Pressable
@@ -81,6 +81,7 @@ const AppDatePickerController = <T extends FieldValues>({
             }}
             onCancel={() => setOpen(false)}
           />
+          {error && <Text style={styles.textError}>{error.message}</Text>}
         </>
       )}
     />
@@ -115,6 +116,13 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     color: 'gray',
+  },
+  textError: {
+    color: 'red',
+    fontSize: s(12),
+    textAlign: 'center',
+    marginTop: -vs(5),
+    marginBottom: vs(10),
   },
 });
 

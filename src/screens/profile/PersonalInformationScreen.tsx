@@ -10,26 +10,26 @@ import { savePersonalInfo } from '../../store/slices/profileSlice';
 import { RootState } from '../../store/store';
 import { colors } from '../../styles/colors';
 
-const schema = yup.object({
-  name: yup.string().required('Це поле обовʼязкове до заповнення'),
-  surname: yup.string().required('Це поле обовʼязкове до заповнення'),
-  email: yup.string().email('Невірний формат email'),
-  phone: yup.string(),
-  website: yup.string(),
-  address: yup.string(),
-  zipCode: yup.string(),
-  city: yup.string(),
-  region: yup.string(),
-  country: yup.string(),
-});
-
-type FormData = yup.InferType<typeof schema>;
-
 const PersonalInformationScreen = () => {
   const dispatch = useDispatch();
   const savedData = useSelector(
     (state: RootState) => state.profile.personalInfo,
   );
+
+  const schema = yup.object({
+    name: yup.string().required('Це поле обовʼязкове до заповнення'),
+    surname: yup.string().required('Це поле обовʼязкове до заповнення'),
+    email: yup.string().email('Невірний формат email'),
+    phone: yup.string(),
+    website: yup.string(),
+    address: yup.string(),
+    zipCode: yup.string(),
+    city: yup.string(),
+    region: yup.string(),
+    country: yup.string(),
+  });
+
+  type FormData = yup.InferType<typeof schema>;
 
   const defaultValues: FormData = {
     name: '',
