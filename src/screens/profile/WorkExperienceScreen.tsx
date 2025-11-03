@@ -4,7 +4,6 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { s } from 'react-native-size-matters';
 import { useDispatch, useSelector } from 'react-redux';
-import EditIcon from '../../assets/icons/EditIcon';
 import AddButton from '../../components/buttons/AddButton';
 import CardItem from '../../components/card/CardItem';
 import WorkExperienceForm from '../../components/forms/WorkExperienceForm';
@@ -72,11 +71,7 @@ const WorkExperienceScreen = () => {
           />
         )}
       />
-      <AddButton
-        title="Додати досвід"
-        onPress={addExperience}
-        children={<EditIcon />}
-      />
+      <AddButton title="Додати досвід" onPress={addExperience} />
       <WorkExperienceForm />
     </View>
   );

@@ -6,9 +6,10 @@ import { colors } from '../../styles/colors';
 
 interface AddButtonProps extends PressableProps {
   title: string;
+  isReload?: boolean;
 }
 
-const AddButton: React.FC<AddButtonProps> = ({ onPress, title }) => {
+const AddButton: React.FC<AddButtonProps> = ({ onPress, title, isReload }) => {
   return (
     <Pressable
       onPress={onPress}
@@ -17,7 +18,7 @@ const AddButton: React.FC<AddButtonProps> = ({ onPress, title }) => {
         pressed && { borderColor: colors.yellow },
       ]}
     >
-      <AddIcon size={s(24)} color={colors.fonts} />
+      {!isReload && <AddIcon size={s(24)} color={colors.fonts} />}
       <Text style={styles.text}>{title}</Text>
     </Pressable>
   );

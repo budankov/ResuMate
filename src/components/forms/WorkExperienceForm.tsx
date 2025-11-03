@@ -52,7 +52,7 @@ const WorkExperienceForm = () => {
     endDate: '',
   };
 
-  const { control, handleSubmit, onSubmit, reset } = useFormHandler<FormData>({
+  const { control, handleSubmit, reset } = useFormHandler<FormData>({
     schema,
     defaultValues,
     onSave: () => {},
@@ -159,10 +159,12 @@ const WorkExperienceForm = () => {
             />
           )}
         </FormLayout>
+
         <View style={{ paddingHorizontal: s(10) }}>
           <AddButton
             onPress={handleSubmit(handleConfirm)}
-            title="Додати досвід"
+            title={editing?.card ? 'Оновити' : 'Додати досвід'}
+            isReload
           />
         </View>
       </View>
