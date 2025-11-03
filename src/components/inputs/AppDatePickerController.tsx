@@ -22,6 +22,29 @@ const AppDatePickerController = <T extends FieldValues>({
 }: Props<T>) => {
   const [open, setOpen] = useState(false);
 
+  const formatDate = (val?: string) => {
+    if (!val) return '';
+    const d = new Date(val);
+    if (Number.isNaN(d.getTime())) return String(val);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
+
+  const parseToDate = (val?: string) => {
+    if (!val) return new Date();
+    const m = val.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if (m)
+      return new Date(
+        parseInt(m[3], 10),
+        parseInt(m[2], 10) - 1,
+        parseInt(m[1], 10),
+      );
+    const d = new Date(val);
+    return Number.isNaN(d.getTime()) ? new Date() : d;
+  };
+
   return (
     <Controller
       control={control}
@@ -38,9 +61,7 @@ const AppDatePickerController = <T extends FieldValues>({
           >
             <CalendarIcon color={colors.fonts} size={20} />
             <Text style={[styles.text, !value && styles.placeholder]}>
-              {value
-                ? new Date(value).toLocaleDateString('uk-UA')
-                : placeholder}
+              {value ? formatDate(value as any) : placeholder}
             </Text>
             <ChevronDownIcon color={colors.fonts} size={18} />
           </Pressable>
@@ -48,7 +69,7 @@ const AppDatePickerController = <T extends FieldValues>({
           <DatePicker
             modal
             open={open}
-            date={value ? new Date(value) : new Date()}
+            date={parseToDate(value as any)}
             mode="date"
             locale="uk"
             title="Виберіть дату"
@@ -56,7 +77,7 @@ const AppDatePickerController = <T extends FieldValues>({
             cancelText="Скасувати"
             onConfirm={date => {
               setOpen(false);
-              onChange(date.toISOString());
+              onChange(formatDate(date.toISOString()));
             }}
             onCancel={() => setOpen(false)}
           />
