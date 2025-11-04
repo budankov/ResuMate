@@ -4,7 +4,12 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  FlatList,
+  Modal,
+  Pressable,
   StyleSheet,
+  Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import RNFS from 'react-native-fs';
@@ -23,7 +28,12 @@ Handlebars.registerHelper('join', function (arr, separator) {
 
 export default function PDFPreviewScreen() {
   const [pdfPath, setPdfPath] = useState<string | null>(null);
+  const [pagesCount, setPagesCount] = useState<number>(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const { width, height } = Dimensions.get('window');
+  const thumbWidth = Math.min(width * 0.8, 720);
+  const thumbHeight = thumbWidth * 1.414;
 
   useEffect(() => {
     const generate = async () => {
@@ -45,8 +55,6 @@ export default function PDFPreviewScreen() {
 
         if (exists) {
           setPdfPath(file.filePath);
-          // 👇 для тесту можна розкоментувати
-          // await Linking.openURL(`file://${file.filePath}`);
         } else {
           Alert.alert('Помилка', 'Файл PDF не знайдено після генерації');
         }
@@ -67,34 +75,74 @@ export default function PDFPreviewScreen() {
     );
   }
 
+  const fileUri = pdfPath.startsWith('file://') ? pdfPath : `file://${pdfPath}`;
+
   return (
-    <View style={styles.container}>
-      <Pdf
-        source={{
-          uri: pdfPath.startsWith('file://') ? pdfPath : `file://${pdfPath}`,
-          cache: true,
-        }}
-        onLoadComplete={(numberOfPages, filePath) =>
-          console.log('PDF loaded, pages:', numberOfPages, 'path:', filePath)
-        }
-        onLoadProgress={percent => console.log('PDF load progress:', percent)}
-        onError={error => {
-          console.log('PDF view error:', error);
-          Alert.alert('PDF error', JSON.stringify(error));
-        }}
-        onPageChanged={(page, numberOfPages) =>
-          console.log(`PDF page ${page} of ${numberOfPages}`)
-        }
-        // Увімкнемо трохи більший початковий масштаб, щоб сторінки виглядали крупніше
-        scale={1.25}
-        minScale={1}
-        maxScale={3}
-        // зменшимо відступ між сторінками
-        spacing={8}
-        // вимкнемо paging, щоб можна було скролити вгору/вниз (false — за замовчуванням)
-        enablePaging={false}
-        style={[styles.pdf, { width, height }]}
-      />
+    <View style={styles.previewRoot}>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => setModalVisible(true)}
+        style={styles.thumbWrapper}
+      >
+        <Pdf
+          source={{ uri: fileUri, cache: true }}
+          page={1}
+          onLoadComplete={n => setPagesCount(n)}
+          style={[styles.thumbnail, { width: thumbWidth, height: thumbHeight }]}
+        />
+      </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <Pressable
+            style={styles.closeButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.closeText}>Закрити</Text>
+          </Pressable>
+
+          {pagesCount > 0 ? (
+            <FlatList
+              data={Array.from({ length: pagesCount }, (_, i) => i + 1)}
+              keyExtractor={item => String(item)}
+              horizontal
+              pagingEnabled
+              initialNumToRender={3}
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={ev => {
+                const page =
+                  Math.round(ev.nativeEvent.contentOffset.x / width) + 1;
+                setCurrentPage(page);
+              }}
+              renderItem={({ item }: { item: number }) => (
+                <View style={{ width, height }}>
+                  <Pdf
+                    source={{ uri: fileUri, cache: true }}
+                    page={item}
+                    scale={1}
+                    style={{ width, height }}
+                  />
+                </View>
+              )}
+            />
+          ) : (
+            <View style={styles.center}>
+              <ActivityIndicator size="large" color="#333" />
+            </View>
+          )}
+        </View>
+      </Modal>
+      {pagesCount > 0 && (
+        <View style={styles.pageIndicator} pointerEvents="none">
+          <Text style={styles.pageIndicatorText}>
+            {currentPage} / {pagesCount}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -102,5 +150,30 @@ export default function PDFPreviewScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  pdf: { flex: 1, borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)' },
+  pdf: { flex: 1, borderWidth: 1, borderColor: '#fff' },
+  previewRoot: { alignItems: 'center', paddingVertical: 12 },
+  thumbWrapper: {
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+  },
+  thumbnail: { borderWidth: 1, borderColor: '#eee', backgroundColor: '#fff' },
+  modalContainer: { flex: 1, backgroundColor: '#fff' },
+  closeButton: { padding: 12, alignSelf: 'flex-end' },
+  closeText: { fontSize: 16, color: '#333', paddingTop: 40 },
+  pageIndicator: {
+    position: 'absolute',
+    top: 48,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  pageIndicatorText: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    color: '#fff',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
 });
