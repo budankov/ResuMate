@@ -12,86 +12,134 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import RNFS from 'react-native-fs';
 import { generatePDF } from 'react-native-html-to-pdf';
-import Pdf from 'react-native-pdf';
-
+import Share from 'react-native-share';
+import { s, vs } from 'react-native-size-matters';
+import { WebView } from 'react-native-webview';
 import cvData from '../../assets/cv-json-example/frontend-cv-schema.json';
-import { template1 } from '../../assets/cv-templates/template-1';
+import AddButton from '../../components/buttons/AddButton';
+import { colors } from '../../styles/colors';
 
+// templates
+import { template1 } from '../../assets/cv-templates/template-1';
+import { template2 } from '../../assets/cv-templates/template-2';
+import { template3 } from '../../assets/cv-templates/template-3';
+import { template4 } from '../../assets/cv-templates/template-4';
+import { template5 } from '../../assets/cv-templates/template-5';
+import { template6 } from '../../assets/cv-templates/template-6';
+
+const templates = [
+  { id: 1, template: template1 },
+  { id: 2, template: template2 },
+  { id: 3, template: template3 },
+  { id: 4, template: template4 },
+  { id: 5, template: template5 },
+  { id: 6, template: template6 },
+];
+
+// ✅ Handlebars helper
 Handlebars.registerHelper('join', function (arr, separator) {
-  if (Array.isArray(arr)) {
-    return arr.join(typeof separator === 'string' ? separator : ', ');
-  }
-  return '';
+  return Array.isArray(arr)
+    ? arr.join(typeof separator === 'string' ? separator : ', ')
+    : '';
 });
 
-export default function PDFPreviewScreen() {
-  const [pdfPath, setPdfPath] = useState<string | null>(null);
-  const [pagesCount, setPagesCount] = useState<number>(0);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const { width, height } = Dimensions.get('window');
-  const thumbWidth = Math.min(width * 0.8, 720);
-  const thumbHeight = thumbWidth * 1.414;
-
-  useEffect(() => {
-    const generate = async () => {
-      try {
-        const compiled = Handlebars.compile(template1);
-        const filledHtml = compiled(cvData);
-
-        const file = await generatePDF({
-          html: filledHtml,
-          fileName: 'resume_preview',
-          directory: 'Documents',
-          base64: false,
-        });
-
-        console.log('PDF generated at:', file.filePath);
-
-        const exists = await RNFS.exists(file.filePath);
-        console.log('PDF exists?', exists);
-
-        if (exists) {
-          setPdfPath(file.filePath);
-        } else {
-          Alert.alert('Помилка', 'Файл PDF не знайдено після генерації');
+// ✅ Обгортка HTML із масштабом
+const wrapHtml = (html: string, scale = 0.4) => `
+  <html>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=${scale}, maximum-scale=${scale}, user-scalable=no" />
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          transform-origin: top left;
+          transform: scale(${scale});
+          overflow: hidden;
+          background: #fff;
         }
-      } catch (err) {
-        console.error('Помилка генерації PDF:', err);
-        Alert.alert('Помилка', 'Не вдалося згенерувати PDF');
-      }
-    };
+      </style>
+    </head>
+    <body>${html}</body>
+  </html>
+`;
 
-    generate();
+export default function PDFPreviewScreen() {
+  const [filledTemplates, setFilledTemplates] = useState<
+    { id: number; html: string }[]
+  >([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const { width, height } = Dimensions.get('window');
+
+  // 🧩 Генеруємо шаблони з даними
+  useEffect(() => {
+    setFilledTemplates(
+      templates.map(t => ({
+        id: t.id,
+        html: Handlebars.compile(t.template)(cvData),
+      })),
+    );
   }, []);
 
-  if (!pdfPath) {
+  // 📤 Шаринг PDF без збереження у пам’ять
+  const handleShare = async () => {
+    if (!selectedTemplate) return;
+    try {
+      const file = await generatePDF({
+        html: selectedTemplate.html,
+        fileName: `resume_${selectedTemplate.id}`,
+        directory: 'Documents',
+        base64: false,
+      });
+
+      await Share.open({
+        title: 'Поділитися резюме',
+        url: `file://${file.filePath}`,
+        type: 'application/pdf',
+        failOnCancel: false,
+      });
+    } catch (err) {
+      console.error('Помилка при шарингу:', err);
+      Alert.alert('Помилка', 'Не вдалося поділитися PDF');
+    }
+  };
+
+  if (filledTemplates.length === 0) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#333" />
+        <Text style={{ marginTop: 10 }}>Генерація шаблонів...</Text>
       </View>
     );
   }
 
-  const fileUri = pdfPath.startsWith('file://') ? pdfPath : `file://${pdfPath}`;
-
   return (
     <View style={styles.previewRoot}>
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => setModalVisible(true)}
-        style={styles.thumbWrapper}
-      >
-        <Pdf
-          source={{ uri: fileUri, cache: true }}
-          page={1}
-          onLoadComplete={n => setPagesCount(n)}
-          style={[styles.thumbnail, { width: thumbWidth, height: thumbHeight }]}
-        />
-      </TouchableOpacity>
+      {/* 🧾 Сітка шаблонів */}
+      <FlatList
+        data={filledTemplates}
+        numColumns={2}
+        keyExtractor={item => item.id.toString()}
+        columnWrapperStyle={styles.columnWrapper}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedTemplate({ id: item.id, html: item.html });
+              setModalVisible(true);
+            }}
+          >
+            <WebView
+              originWhitelist={['*']}
+              source={{ html: wrapHtml(item.html, 0.3) }}
+              style={styles.previewWebView}
+            />
+            <Text style={styles.templateLabel}>Шаблон {item.id}</Text>
+          </TouchableOpacity>
+        )}
+      />
 
+      {/* 🔍 Модалка перегляду */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -105,75 +153,59 @@ export default function PDFPreviewScreen() {
             <Text style={styles.closeText}>Закрити</Text>
           </Pressable>
 
-          {pagesCount > 0 ? (
-            <FlatList
-              data={Array.from({ length: pagesCount }, (_, i) => i + 1)}
-              keyExtractor={item => String(item)}
-              horizontal
-              pagingEnabled
-              initialNumToRender={3}
-              showsHorizontalScrollIndicator={false}
-              onMomentumScrollEnd={ev => {
-                const page =
-                  Math.round(ev.nativeEvent.contentOffset.x / width) + 1;
-                setCurrentPage(page);
-              }}
-              renderItem={({ item }: { item: number }) => (
-                <View style={{ width, height }}>
-                  <Pdf
-                    source={{ uri: fileUri, cache: true }}
-                    page={item}
-                    scale={1}
-                    style={{ width, height }}
-                  />
-                </View>
-              )}
+          {selectedTemplate && (
+            <WebView
+              originWhitelist={['*']}
+              source={{ html: wrapHtml(selectedTemplate.html, 0.5) }}
+              style={{ flex: 1, width, height }}
             />
-          ) : (
-            <View style={styles.center}>
-              <ActivityIndicator size="large" color="#333" />
+          )}
+
+          {/* 📤 Кнопка "Поділитися" */}
+          {selectedTemplate && (
+            <View style={styles.shareContainer}>
+              <AddButton title="Поділитися" isReload onPress={handleShare} />
             </View>
           )}
         </View>
       </Modal>
-      {pagesCount > 0 && (
-        <View style={styles.pageIndicator} pointerEvents="none">
-          <Text style={styles.pageIndicatorText}>
-            {currentPage} / {pagesCount}
-          </Text>
-        </View>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  pdf: { flex: 1, borderWidth: 1, borderColor: '#fff' },
-  previewRoot: { alignItems: 'center', paddingVertical: 12 },
-  thumbWrapper: {
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-  },
-  thumbnail: { borderWidth: 1, borderColor: '#eee', backgroundColor: '#fff' },
-  modalContainer: { flex: 1, backgroundColor: '#fff' },
-  closeButton: { padding: 12, alignSelf: 'flex-end' },
-  closeText: { fontSize: 16, color: '#333', paddingTop: 40 },
-  pageIndicator: {
-    position: 'absolute',
-    top: 48,
-    left: 0,
-    right: 0,
+  previewRoot: {
+    flex: 1,
     alignItems: 'center',
+    paddingVertical: 12,
+    backgroundColor: colors.primary,
   },
-  pageIndicatorText: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    color: '#fff',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  columnWrapper: {
+    justifyContent: 'space-around',
+    marginBottom: 20,
+    gap: 20,
+  },
+  previewWebView: {
+    width: 150,
+    height: 212,
     borderRadius: 8,
+    overflow: 'hidden',
+  },
+  templateLabel: {
+    textAlign: 'center',
+    marginTop: 6,
+    color: colors.fonts,
+    fontWeight: '600',
+  },
+  modalContainer: { flex: 1, backgroundColor: colors.primary },
+  closeButton: { padding: 12, alignSelf: 'flex-end' },
+  closeText: { fontSize: 16, color: colors.fonts, paddingTop: 40 },
+  shareContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: s(14),
+    paddingVertical: vs(10),
+    backgroundColor: colors.primary,
   },
 });

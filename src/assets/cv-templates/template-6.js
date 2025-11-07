@@ -1,4 +1,4 @@
-export const template1 = `
+export const template6 = `
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,7 +25,7 @@ export const template1 = `
         font-size: 12px;
         line-height: 1.4;
         color: #000000;
-        background: #ffffff;
+        background: #4fcbeaff;
         margin: 0;
         padding: 0;
       }
@@ -97,12 +97,12 @@ export const template1 = `
         height: 297mm;
         margin: 0 auto;
         padding: 15mm;
-        background: #ffffff;
+        background: #4fcbeaff;
         box-sizing: border-box;
       }
 
       .cv-wrapper {
-        background: #ffffff;
+        background: #4fcbeaff;
         height: 100%;
         padding: 0;
       }
@@ -335,7 +335,7 @@ export const template1 = `
       }
     </style>
   </head>
-  <body>
+<body style="-webkit-print-color-adjust: exact; background-color: #4fcbeaff;">
     <div class="cv-container">
       <div class="cv-wrapper">
         <div class="cv-content">
