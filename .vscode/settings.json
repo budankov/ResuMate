@@ -1,0 +1,9 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "editor.codeActionsOnSaveTimeout": 500,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+  "javascript.suggestionActions.enabled": false,
+  "typescript.suggestionActions.enabled": false
+}
