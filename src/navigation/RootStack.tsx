@@ -1,10 +1,11 @@
 import { createStaticNavigation } from "@react-navigation/native";
 import { Platform } from "react-native";
 import HomeScreen from "../screens/HomeScreen";
-import SettingsScreen from "../screens/SettingsScreen";
 
 import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable";
-import CreateScreen from "../screens/CreateScreen";
+import MoreScreen from "../screens/MoreScreen";
+import ProfileScreen from "../screens/ProfileScreen";
+import TemplatesScreen from "../screens/TemplatesScreen";
 
 const Tabs = createNativeBottomTabNavigator({
   screenOptions: {
@@ -15,36 +16,44 @@ const Tabs = createNativeBottomTabNavigator({
     tabBarStyle: {},
   },
   screens: {
-    Головна: {
+    Home: {
       screen: HomeScreen,
       options: {
+        title: "Головна",
+        tabBarLabel: "Головна",
         tabBarIcon:
           Platform.OS === "ios"
             ? { type: "sfSymbol", name: "house" }
             : { type: "image", source: require("../../assets/icon.png") },
       },
     },
-    Шаблони: {
-      screen: CreateScreen,
+    Templates: {
+      screen: TemplatesScreen,
       options: {
+        title: "Шаблони",
+        tabBarLabel: "Шаблони",
         tabBarIcon:
           Platform.OS === "ios"
             ? { type: "sfSymbol", name: "document.on.document" }
             : { type: "image", source: require("../../assets/icon.png") },
       },
     },
-    Профіль: {
-      screen: CreateScreen,
+    Profile: {
+      screen: ProfileScreen,
       options: {
+        title: "Профіль користувача",
+        tabBarLabel: "Профіль",
         tabBarIcon:
           Platform.OS === "ios"
             ? { type: "sfSymbol", name: "person" }
             : { type: "image", source: require("../../assets/icon.png") },
       },
     },
-    Більше: {
-      screen: SettingsScreen,
+    More: {
+      screen: MoreScreen,
       options: {
+        title: "Більше",
+        tabBarLabel: "Більше",
         tabBarIcon:
           Platform.OS === "ios"
             ? { type: "sfSymbol", name: "gearshape" }
