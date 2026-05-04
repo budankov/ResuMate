@@ -15,7 +15,7 @@ const Tabs = createNativeBottomTabNavigator({
     tabBarStyle: {},
   },
   screens: {
-    Home: {
+    Головна: {
       screen: HomeScreen,
       options: {
         tabBarIcon:
@@ -24,16 +24,25 @@ const Tabs = createNativeBottomTabNavigator({
             : { type: "image", source: require("../../assets/icon.png") },
       },
     },
-    Create: {
+    Шаблони: {
       screen: CreateScreen,
       options: {
         tabBarIcon:
           Platform.OS === "ios"
-            ? { type: "sfSymbol", name: "plus.app" }
+            ? { type: "sfSymbol", name: "document.on.document" }
             : { type: "image", source: require("../../assets/icon.png") },
       },
     },
-    Settings: {
+    Профіль: {
+      screen: CreateScreen,
+      options: {
+        tabBarIcon:
+          Platform.OS === "ios"
+            ? { type: "sfSymbol", name: "person" }
+            : { type: "image", source: require("../../assets/icon.png") },
+      },
+    },
+    Більше: {
       screen: SettingsScreen,
       options: {
         tabBarIcon:
