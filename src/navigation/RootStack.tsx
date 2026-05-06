@@ -1,11 +1,10 @@
+import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable";
 import { createStaticNavigation } from "@react-navigation/native";
 import { Platform } from "react-native";
-import HomeScreen from "../screens/HomeScreen";
-
-import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable";
-import MoreScreen from "../screens/MoreScreen";
-import ProfileScreen from "../screens/ProfileScreen";
-import TemplatesScreen from "../screens/TemplatesScreen";
+import HomeScreen from "../screens/main/HomeScreen";
+import MoreScreen from "../screens/main/MoreScreen";
+import TemplatesScreen from "../screens/main/TemplatesScreen";
+import ProfileStack from "./ProfileStack";
 
 const Tabs = createNativeBottomTabNavigator({
   screenOptions: {
@@ -39,7 +38,7 @@ const Tabs = createNativeBottomTabNavigator({
       },
     },
     Profile: {
-      screen: ProfileScreen,
+      screen: ProfileStack,
       options: {
         title: "Профіль користувача",
         tabBarLabel: "Профіль",

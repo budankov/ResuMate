@@ -1,0 +1,129 @@
+import Entypo from "@expo/vector-icons/Entypo";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import React, { useState } from "react";
+import { Control, Controller, FieldValues, Path } from "react-hook-form";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { s, vs } from "react-native-size-matters";
+import { colors } from "../../styles/colors";
+
+interface Props<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  placeholder: string;
+  label?: string;
+}
+
+const AppDatePickerController = <T extends FieldValues>({
+  control,
+  name,
+  placeholder,
+  label,
+}: Props<T>) => {
+  const [open, setOpen] = useState(false);
+
+  const formatDate = (val?: string) => {
+    if (!val) return "";
+    const d = new Date(val);
+    if (Number.isNaN(d.getTime())) return String(val);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
+
+  const parseToDate = (val?: string) => {
+    if (!val) return new Date();
+    const m = val.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if (m)
+      return new Date(
+        parseInt(m[3], 10),
+        parseInt(m[2], 10) - 1,
+        parseInt(m[1], 10),
+      );
+    const d = new Date(val);
+    return Number.isNaN(d.getTime()) ? new Date() : d;
+  };
+
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field: { onChange, value }, fieldState: { error } }) => (
+        <>
+          {label && <Text style={styles.label}>{label}</Text>}
+          <Pressable
+            style={({ pressed }) => [
+              styles.inputContainer,
+              pressed && { borderColor: colors.yellow },
+            ]}
+            onPress={() => setOpen(true)}
+          >
+            <FontAwesome name="calendar" color={colors.fonts} size={20} />
+            <Text style={[styles.text, !value && styles.placeholder]}>
+              {value ? formatDate(value as any) : placeholder}
+            </Text>
+            <Entypo name="chevron-down" color={colors.fonts} size={18} />
+          </Pressable>
+
+          <Modal visible={open} transparent animationType="slide">
+            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+              <DateTimePicker
+                value={parseToDate(value)}
+                mode="date"
+                display="spinner"
+                onChange={(event, date) => {
+                  if (event.type === "set" && date) {
+                    onChange(formatDate(date.toISOString()));
+                  }
+                  setOpen(false);
+                }}
+              />
+            </View>
+          </Modal>
+          {error && <Text style={styles.textError}>{error.message}</Text>}
+        </>
+      )}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  label: {
+    color: "purple",
+    fontSize: s(14),
+    marginBottom: vs(4),
+  },
+  inputContainer: {
+    width: "100%",
+    height: vs(40),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: colors.primary,
+    borderColor: "rgba(255,255,255,0.25)",
+    borderWidth: 2,
+    borderRadius: s(16),
+    paddingHorizontal: s(12),
+    paddingVertical: vs(12),
+    marginVertical: vs(4),
+  },
+  text: {
+    flex: 1,
+    textAlign: "center",
+    color: colors.fonts,
+    fontSize: s(14),
+  },
+  placeholder: {
+    color: "gray",
+  },
+  textError: {
+    color: "red",
+    fontSize: s(12),
+    textAlign: "center",
+    marginTop: -vs(5),
+    marginBottom: vs(10),
+  },
+});
+
+export default AppDatePickerController;

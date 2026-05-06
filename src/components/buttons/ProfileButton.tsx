@@ -1,0 +1,95 @@
+import Entypo from "@expo/vector-icons/Entypo";
+import React from "react";
+import {
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { s, vs } from "react-native-size-matters";
+import { colors } from "../../styles/colors";
+
+interface ProfileButtonProps extends PressableProps {
+  title: string;
+  children: React.ReactElement<{ size?: number; color?: string }>;
+}
+
+const ProfileButton: React.FC<ProfileButtonProps> = ({
+  onPress,
+  title,
+  children,
+}) => {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.btn,
+        { borderColor: colors.border },
+        pressed && { borderColor: colors.yellow },
+      ]}
+    >
+      {({ pressed }) => {
+        const iconWithProps = React.cloneElement(children, {
+          size: s(20),
+          color: pressed ? colors.yellow : colors.fonts,
+        });
+
+        return (
+          <>
+            <View style={styles.titleWrapper}>
+              <View
+                style={[
+                  styles.iconWrapper,
+                  { borderColor: colors.border },
+                  pressed && { borderColor: colors.yellow },
+                ]}
+              >
+                {iconWithProps}
+              </View>
+              <Text style={styles.text}>{title}</Text>
+            </View>
+            <Entypo name="chevron-right" size={s(20)} color={colors.fonts} />
+          </>
+        );
+      }}
+    </Pressable>
+  );
+};
+
+const styles = StyleSheet.create({
+  btn: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: colors.primary,
+    paddingVertical: vs(4),
+    paddingHorizontal: s(15),
+    borderRadius: s(16),
+    gap: s(12),
+    borderWidth: 2,
+    marginVertical: vs(2),
+  },
+  titleWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: s(12),
+  },
+  iconWrapper: {
+    width: s(36),
+    height: s(36),
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+    borderRadius: s(10),
+    borderWidth: s(2),
+    borderColor: colors.subFonts,
+  },
+  text: {
+    color: colors.fonts,
+    fontSize: s(16),
+  },
+});
+
+export default ProfileButton;

@@ -1,0 +1,214 @@
+import React, { useEffect } from "react";
+import { Controller, useWatch } from "react-hook-form";
+import { StyleSheet, Switch, Text, View } from "react-native";
+import { s, vs } from "react-native-size-matters";
+import { useDispatch, useSelector } from "react-redux";
+import * as yup from "yup";
+
+import FormLayout from "../../components/forms/FormLayout";
+import AppDatePickerController from "../../components/inputs/AppDatePickerController";
+import AppTextInputController from "../../components/inputs/AppTextInputController";
+
+import { useFormHandler } from "../../hooks/useFormHandler";
+
+import {
+  addCard,
+  closeEditor,
+  updateCard,
+} from "../../store/slices/cardsSlice";
+
+import { saveWorkExperience } from "../../store/slices/profileSlice";
+import { RootState } from "../../store/store";
+import { colors } from "../../styles/colors";
+import AddButton from "../buttons/AddButton";
+
+type WorkExperience = RootState["profile"]["workExperience"][number];
+type WorkExperienceCard = { id: string; data: WorkExperience };
+
+const EMPTY_WORK_EXPERIENCE: WorkExperienceCard[] = [];
+
+const WorkExperienceForm = ({ onClose }: { onClose?: () => void }) => {
+  const dispatch = useDispatch();
+
+  const editing = useSelector((state: RootState) => state.cards.editing);
+  const experienceList = useSelector(
+    (state: RootState) =>
+      (state.cards.records?.workExperience as
+        | WorkExperienceCard[]
+        | undefined) ?? EMPTY_WORK_EXPERIENCE,
+  );
+
+  const schema = yup.object({
+    position: yup.string().required("Це поле обовʼязкове до заповнення"),
+    company: yup.string().required("Це поле обовʼязкове до заповнення"),
+    location: yup.string(),
+    website: yup.string(),
+    responsibilities: yup.string(),
+    startDate: yup.string().required("Це поле обовʼязкове до заповнення"),
+    isEnabled: yup.boolean(),
+    endDate: yup.string().when("isEnabled", {
+      is: false,
+      then: (schemaField) =>
+        schemaField.required("Це поле обовʼязкове до заповнення"),
+      otherwise: (schemaField) => schemaField.notRequired(),
+    }),
+  });
+
+  type FormData = yup.InferType<typeof schema>;
+
+  const defaultValues = React.useMemo<FormData>(
+    () => ({
+      position: "",
+      company: "",
+      location: "",
+      website: "",
+      responsibilities: "",
+      startDate: "",
+      endDate: "",
+      isEnabled: false,
+    }),
+    [],
+  );
+
+  const { control, handleSubmit, reset } = useFormHandler<FormData>({
+    schema,
+    defaultValues,
+    onSave: () => {},
+  });
+
+  const isEnabled = useWatch({
+    control,
+    name: "isEnabled",
+    defaultValue: defaultValues.isEnabled,
+  }) as boolean;
+
+  // 📌 RESET FORM WHEN EDITING CHANGES
+  useEffect(() => {
+    const values: FormData =
+      editing && editing.card
+        ? ({
+            ...(editing.card.data as FormData),
+            isEnabled: (editing.card.data as any)?.isEnabled ?? false,
+          } as FormData)
+        : (defaultValues as FormData);
+
+    reset(values);
+  }, [editing, reset, defaultValues]);
+
+  // 📌 HANDLE SAVE
+  const handleConfirm = (data: FormData) => {
+    const namespace = "workExperience";
+
+    const current = experienceList.map((c: any) => c.data);
+    let newPayload: any[] = [];
+
+    if (editing && editing.card) {
+      newPayload = current.map((d: any, idx: number) =>
+        experienceList[idx].id === editing.card!.id ? data : d,
+      );
+      dispatch(updateCard({ namespace, id: editing.card.id, data }));
+    } else {
+      newPayload = [...current, data];
+      dispatch(addCard({ namespace, card: { data } }));
+    }
+
+    dispatch(saveWorkExperience(newPayload));
+
+    dispatch(closeEditor());
+    onClose?.();
+  };
+
+  return (
+    <>
+      <FormLayout>
+        <AppTextInputController
+          control={control}
+          name="position"
+          placeholder="Посада"
+        />
+
+        <AppTextInputController
+          control={control}
+          name="company"
+          placeholder="Назва компанії"
+        />
+
+        <AppTextInputController
+          control={control}
+          name="location"
+          placeholder="Місце знаходження"
+        />
+
+        <AppTextInputController
+          control={control}
+          name="website"
+          placeholder="Веб-сторінка"
+        />
+
+        <AppTextInputController
+          control={control}
+          name="responsibilities"
+          placeholder="Обовязки"
+          multiline
+          scrollEnabled
+          styleInput={[{ height: vs(150) }]}
+        />
+
+        <AppDatePickerController
+          control={control}
+          name="startDate"
+          placeholder="Дата працевлаштування"
+        />
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.switchTitle}>Це ваша поточна посада?</Text>
+
+          <Controller
+            control={control}
+            name="isEnabled"
+            render={({ field: { value, onChange } }) => (
+              <Switch
+                trackColor={{ false: "#767577", true: "#3e3e3e" }}
+                thumbColor={value ? colors.yellow : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={onChange}
+                value={!!value}
+              />
+            )}
+          />
+        </View>
+
+        {!isEnabled && (
+          <AppDatePickerController
+            control={control}
+            name="endDate"
+            placeholder="Дата звільнення"
+          />
+        )}
+
+        <View style={{ paddingHorizontal: s(10) }}>
+          <AddButton
+            onPress={handleSubmit(handleConfirm)}
+            title={editing?.card ? "Оновити" : "Додати досвід"}
+            isReload
+          />
+        </View>
+      </FormLayout>
+    </>
+  );
+};
+
+const styles = StyleSheet.create({
+  switchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: vs(5),
+  },
+  switchTitle: {
+    color: colors.fonts,
+    fontSize: s(14),
+  },
+});
+
+export default WorkExperienceForm;
