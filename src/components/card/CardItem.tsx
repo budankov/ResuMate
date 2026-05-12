@@ -1,9 +1,9 @@
-import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { s, vs } from 'react-native-size-matters';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import { colors } from '../../styles/colors';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { s, vs } from "react-native-size-matters";
+import { colors } from "../../styles/colors";
 
 const CardItem = ({
   title,
@@ -14,7 +14,7 @@ const CardItem = ({
   deleteCard,
 }) => {
   return (
-    <View style={styles.cardItem}>
+    <View style={[styles.cardItem, { borderColor: colors.border }]}>
       <View style={styles.infoSection}>
         <Text
           style={styles.titlePosition}
@@ -44,10 +44,14 @@ const CardItem = ({
       </View>
       <View style={styles.buttonSection}>
         <Pressable onPress={() => editCard()}>
-          <AntDesign size={s(24)} color={colors.fonts} />
+          <AntDesign name="edit" size={s(24)} color={colors.fonts} />
         </Pressable>
         <Pressable onPress={() => deleteCard()}>
-          <MaterialIcons name="delete-outline" size={s(24)} color={colors.fonts} />
+          <MaterialIcons
+            name="delete-outline"
+            size={s(24)}
+            color={colors.fonts}
+          />
         </Pressable>
       </View>
     </View>
@@ -56,11 +60,10 @@ const CardItem = ({
 
 const styles = StyleSheet.create({
   cardItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: colors.primary,
-    borderColor: 'rgba(255,255,255,0.25)',
     borderWidth: 2,
     borderRadius: s(16),
     paddingHorizontal: s(12),
@@ -76,14 +79,14 @@ const styles = StyleSheet.create({
     color: colors.fonts,
   },
   dateContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   infoSection: {
-    maxWidth: '75%',
+    maxWidth: "75%",
   },
   buttonSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: s(15),
   },
 });

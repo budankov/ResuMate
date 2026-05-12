@@ -55,30 +55,33 @@ const AppDatePickerController = <T extends FieldValues>({
           <Pressable
             style={({ pressed }) => [
               styles.inputContainer,
+              { borderColor: colors.border },
               pressed && { borderColor: colors.yellow },
             ]}
             onPress={() => setOpen(true)}
           >
-            <FontAwesome name="calendar" color={colors.fonts} size={20} />
+            <FontAwesome name="calendar" color={colors.fonts} size={18} />
             <Text style={[styles.text, !value && styles.placeholder]}>
               {value ? formatDate(value as any) : placeholder}
             </Text>
             <Entypo name="chevron-down" color={colors.fonts} size={18} />
           </Pressable>
 
-          <Modal visible={open} transparent animationType="slide">
-            <View style={{ flex: 1, justifyContent: "flex-end" }}>
-              <DateTimePicker
-                value={parseToDate(value)}
-                mode="date"
-                display="spinner"
-                onChange={(event, date) => {
-                  if (event.type === "set" && date) {
-                    onChange(formatDate(date.toISOString()));
-                  }
-                  setOpen(false);
-                }}
-              />
+          <Modal visible={open} transparent>
+            <View style={styles.modalOverlay}>
+              <View style={styles.pickerContainer}>
+                <DateTimePicker
+                  value={parseToDate(value)}
+                  mode="date"
+                  display="spinner"
+                  onChange={(event, date) => {
+                    if (event.type === "set" && date) {
+                      onChange(formatDate(date.toISOString()));
+                    }
+                    setOpen(false);
+                  }}
+                />
+              </View>
             </View>
           </Modal>
           {error && <Text style={styles.textError}>{error.message}</Text>}
@@ -101,7 +104,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: colors.primary,
-    borderColor: "rgba(255,255,255,0.25)",
     borderWidth: 2,
     borderRadius: s(16),
     paddingHorizontal: s(12),
@@ -123,6 +125,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: -vs(5),
     marginBottom: vs(10),
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+
+  pickerContainer: {
+    backgroundColor: "white",
+    borderRadius: s(20),
+    padding: s(10),
   },
 });
 
