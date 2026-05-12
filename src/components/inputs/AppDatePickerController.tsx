@@ -59,7 +59,10 @@ const AppDatePickerController = <T extends FieldValues>({
       render={({ field: { onChange, value }, fieldState: { error } }) => {
         const handleOpenPicker = useCallback(() => {
           Keyboard.dismiss();
-          setOpen(true);
+
+          setTimeout(() => {
+            setOpen(true);
+          }, 250);
         }, []);
 
         const handleDateChange = useCallback(
@@ -67,7 +70,6 @@ const AppDatePickerController = <T extends FieldValues>({
             if (event.type === "set" && date) {
               onChange(formatDate(date.toISOString()));
             }
-            // Невелика затримка для безпечного закриття модалі
             setTimeout(() => {
               setOpen(false);
             }, 100);
@@ -98,6 +100,7 @@ const AppDatePickerController = <T extends FieldValues>({
               transparent
               animationType="fade"
               onRequestClose={() => setOpen(false)}
+              presentationStyle="overFullScreen"
             >
               <View style={styles.modalOverlay}>
                 <Pressable

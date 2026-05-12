@@ -186,7 +186,7 @@ const WorkExperienceForm = ({ onClose }: { onClose?: () => void }) => {
           />
         )}
 
-        <View style={{ paddingHorizontal: s(10) }}>
+        <View style={{ paddingHorizontal: s(10), paddingTop: vs(10) }}>
           <AddButton
             onPress={handleSubmit(handleConfirm)}
             title={editing?.card ? "Оновити" : "Додати досвід"}

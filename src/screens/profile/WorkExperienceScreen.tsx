@@ -75,11 +75,10 @@ const WorkExperienceScreen = () => {
 
   return (
     <View style={styles.container}>
-      <AddButton title="Додати досвід" onPress={addExperience} />
-
       <FlatList
         data={experienceList}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
           <CardItem
             title={item.data.position}
@@ -92,11 +91,15 @@ const WorkExperienceScreen = () => {
         )}
       />
 
+      <View style={styles.floatingButton}>
+        <AddButton title="Додати досвід" onPress={addExperience} />
+      </View>
+
       <AppBottomSheet
         sheetRef={bottomSheetRef}
         onDismiss={() => dispatch(closeEditor())}
       >
-        <BottomSheetView style={styles.sheetContent}>
+        <BottomSheetView>
           <WorkExperienceForm
             onClose={() => bottomSheetRef.current?.dismiss()}
           />
@@ -110,11 +113,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.primary,
-    paddingHorizontal: s(10),
   },
-  sheetContent: {
-    flex: 1,
-    padding: 16,
+  listContent: {
+    paddingHorizontal: s(10),
+    paddingBottom: 140,
+  },
+  floatingButton: {
+    position: "absolute",
+    left: s(10),
+    right: s(10),
+    bottom: 90,
   },
 });
 
