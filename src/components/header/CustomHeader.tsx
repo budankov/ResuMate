@@ -1,7 +1,9 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import React, { FC } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { s, vs } from "react-native-size-matters";
+import { IS_IOS } from "../../constants/constants";
 import { screens } from "../../screens/profile/ScreenList";
 import { colors } from "../../styles/colors";
 
@@ -24,6 +26,7 @@ const CustomHeader: FC<CustomHeaderProps> = ({
   const title = screen ? screen.title : route.name;
   const headerRight = options?.headerRight?.();
   const isDirty = route.params?.isDirty;
+  const insets = useSafeAreaInsets();
 
   const handleBackPress = () => {
     if (isDirty) {
@@ -41,7 +44,15 @@ const CustomHeader: FC<CustomHeaderProps> = ({
   };
 
   return (
-    <View style={styles.header}>
+    <View
+      style={[
+        styles.header,
+        {
+          paddingTop: insets.top,
+          height: IS_IOS ? insets.top + vs(44) : insets.top + vs(56),
+        },
+      ]}
+    >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         {back && (
           <Pressable onPress={handleBackPress}>
@@ -63,8 +74,7 @@ const CustomHeader: FC<CustomHeaderProps> = ({
 
 const styles = StyleSheet.create({
   header: {
-    height: vs(50),
-    backgroundColor: colors.primary,
+    backgroundColor: "green",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

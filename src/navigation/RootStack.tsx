@@ -8,7 +8,7 @@ import ProfileStack from "./ProfileStack";
 
 const Tabs = createNativeBottomTabNavigator({
   screenOptions: {
-    headerShown: true,
+    headerShown: false,
     tabBarActiveTintColor: "#f76f30",
     tabBarBlurEffect:
       Platform.OS === "ios" ? "systemUltraThinMaterial" : undefined,
