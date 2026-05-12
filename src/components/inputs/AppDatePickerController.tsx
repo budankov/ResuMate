@@ -1,9 +1,16 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Keyboard,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { s, vs } from "react-native-size-matters";
 import { colors } from "../../styles/colors";
 
@@ -49,44 +56,69 @@ const AppDatePickerController = <T extends FieldValues>({
     <Controller
       control={control}
       name={name}
-      render={({ field: { onChange, value }, fieldState: { error } }) => (
-        <>
-          {label && <Text style={styles.label}>{label}</Text>}
-          <Pressable
-            style={({ pressed }) => [
-              styles.inputContainer,
-              { borderColor: colors.border },
-              pressed && { borderColor: colors.yellow },
-            ]}
-            onPress={() => setOpen(true)}
-          >
-            <FontAwesome name="calendar" color={colors.fonts} size={18} />
-            <Text style={[styles.text, !value && styles.placeholder]}>
-              {value ? formatDate(value as any) : placeholder}
-            </Text>
-            <Entypo name="chevron-down" color={colors.fonts} size={18} />
-          </Pressable>
+      render={({ field: { onChange, value }, fieldState: { error } }) => {
+        const handleOpenPicker = useCallback(() => {
+          Keyboard.dismiss();
+          setOpen(true);
+        }, []);
 
-          <Modal visible={open} transparent>
-            <View style={styles.modalOverlay}>
-              <View style={styles.pickerContainer}>
-                <DateTimePicker
-                  value={parseToDate(value)}
-                  mode="date"
-                  display="spinner"
-                  onChange={(event, date) => {
-                    if (event.type === "set" && date) {
-                      onChange(formatDate(date.toISOString()));
-                    }
-                    setOpen(false);
-                  }}
+        const handleDateChange = useCallback(
+          (event: any, date: any) => {
+            if (event.type === "set" && date) {
+              onChange(formatDate(date.toISOString()));
+            }
+            // Невелика затримка для безпечного закриття модалі
+            setTimeout(() => {
+              setOpen(false);
+            }, 100);
+          },
+          [onChange],
+        );
+
+        return (
+          <>
+            {label && <Text style={styles.label}>{label}</Text>}
+            <Pressable
+              style={({ pressed }) => [
+                styles.inputContainer,
+                { borderColor: colors.border },
+                pressed && { borderColor: colors.yellow },
+              ]}
+              onPress={handleOpenPicker}
+            >
+              <FontAwesome name="calendar" color={colors.fonts} size={18} />
+              <Text style={[styles.text, !value && styles.placeholder]}>
+                {value ? formatDate(value as any) : placeholder}
+              </Text>
+              <Entypo name="chevron-down" color={colors.fonts} size={18} />
+            </Pressable>
+
+            <Modal
+              visible={open}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setOpen(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <Pressable
+                  style={StyleSheet.absoluteFill}
+                  onPress={() => setOpen(false)}
                 />
+                <View style={styles.pickerContainer}>
+                  <DateTimePicker
+                    value={parseToDate(value)}
+                    mode="date"
+                    display="spinner"
+                    onChange={handleDateChange}
+                  />
+                </View>
               </View>
-            </View>
-          </Modal>
-          {error && <Text style={styles.textError}>{error.message}</Text>}
-        </>
-      )}
+            </Modal>
+
+            {error && <Text style={styles.textError}>{error.message}</Text>}
+          </>
+        );
+      }}
     />
   );
 };
